@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <members>*</members>
+        <members>Access</members>
+        <members>AccessTest</members>
+        <members>Constants</members>
+        <members>Log</members>
+        <members>LogService</members>
+        <members>LogServiceTest</members>
+        <members>SObjectDomain</members>
+        <members>SObjectDomainTest</members>
+        <members>TestData</members>
+        <members>Utils</members>
+        <members>UtilsTest</members>
         <name>ApexClass</name>
     </types>
     <types>
-        <members>*</members>
-        <name>ApexComponent</name>
+        <members>Log__c.Information__c</members>
+        <members>Log__c.Location__c</members>
+        <members>Log__c.Message__c</members>
+        <name>CustomField</name>
+	    </types>
+    <types>
+        <members>Log__c</members>
+        <name>CustomObject</name>
     </types>
     <types>
-        <members>*</members>
-        <name>ApexPage</name>
+        <members>Log__c</members>
+        <name>CustomTab</name>
     </types>
     <types>
-        <members>*</members>
-        <name>ApexTestSuite</name>
+        <members>Log__c-Log Layout</members>
+        <name>Layout</name>
     </types>
     <types>
-        <members>*</members>
-        <name>ApexTrigger</name>
+        <members>Log__c.All</members>
+        <name>ListView</name>
     </types>
-    <types>
-        <members>*</members>
-        <name>AuraDefinitionBundle</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>LightningComponentBundle</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>StaticResource</name>
-    </types>
-    <version>50.0</version>
+    <version>52.0</version>
 </Package>
