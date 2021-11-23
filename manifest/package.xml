@@ -36,5 +36,9 @@
         <members>Log__c.All</members>
         <name>ListView</name>
     </types>
+    <types>
+        <members>PermSet</members>
+        <name>PermissionSet</name>
+    </types>
     <version>52.0</version>
 </Package>

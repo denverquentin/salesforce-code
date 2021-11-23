@@ -1,22 +1,6 @@
 @IsTest
 private class UtilsTest {
 
-	@IsTest
-	static void testContants() {
-		//check if there is a object with the namespace
-		Map<String, Schema.SObjectType> objList = Schema.getGlobalDescribe();
-
-		if (objList.get(Constants.PACKAGED_OBJ) == null) {
-			System.assertEquals(null, Constants.getNameSpacePrefix());
-			System.assertEquals('', Constants.getClassNS());
-			System.assertEquals('', Constants.getFieldObjectNS());
-		} else {
-			System.assertEquals(Constants.NAMESPACE, Constants.getNameSpacePrefix());
-			System.assertEquals(Constants.NAMESPACE + '.', Constants.getClassNS());
-			System.assertEquals(Constants.NAMESPACE + '__', Constants.getFieldObjectNS());
-		}
-	}
-
 
 	@IsTest
 	static void testProdSandbox() {
@@ -27,7 +11,7 @@ private class UtilsTest {
 		Utils.infoMsg('info');
 		Utils.warnMsg('warn');
 		Utils.errorMsg('error');
-		Utils.errorMsg(new Constants.UstException('ust exception'));
+		Utils.errorMsg(new Constants.ValidationException('vali exception'));
 		Utils.log('log');
 		Utils.logError(new Constants.ValidationException('validation exception'));
 		try {

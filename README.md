@@ -82,7 +82,7 @@ Deploy (push) all metadata and code from the Git branch on your local computer t
 
 
 #### Retrieve (Pull) Metadata from Org
-- `sfdx force:source:retrieve -u dev -x manifest/package.xml` \
+- `sfdx force:source:retrieve -u dev -x manifest/package.xml`\
 Retrieve (pull) all metadata and code defined in the manifest/package.xml from your SF dev org to your computer.
 
 
