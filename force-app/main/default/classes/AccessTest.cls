@@ -122,7 +122,7 @@ private class AccessTest {
 			Lead l = new Lead();
 			l.FirstName = 'Boss';
 			l.LastName = 'Baby';
-			l.Company = 'UST';
+			l.Company = 'Github';
 			l.Email = 'bb@github.com';
 			l.Phone = '303-867-5309';
 			l.Title = 'Boss Baby';
@@ -200,8 +200,8 @@ private class AccessTest {
 			Lead l = new Lead();
 			l.FirstName = 'Boss';
 			l.LastName = 'Baby';
-			l.Company = 'UST';
-			l.Email = 'bb@ust.com';
+			l.Company = 'Github';
+			l.Email = 'bb@github.com';
 			l.Phone = '303-867-5309';
 			l.Title = 'Boss Baby';
 
@@ -249,8 +249,8 @@ private class AccessTest {
 			Lead l = new Lead();
 			l.FirstName = 'Boss';
 			l.LastName = 'Baby';
-			l.Company = 'UST';
-			l.Email = 'bb@ust.com';
+			l.Company = 'Github';
+			l.Email = 'bb@github.com';
 			l.Phone = '303-867-5309';
 			l.Title = 'Boss Baby';
 

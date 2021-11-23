@@ -214,7 +214,7 @@ public inherited sharing class Utils {
 			} else if (cleanZip.length() == 9) {
 				return cleanZip.substring(0,5) + '-' + cleanZip.substring(5,9);
 			} else {
-				throw new Constants.UstException('Invalid Postal Code.');
+				throw new Constants.ValidationException('Invalid Postal Code.');
 			}
 		}
 		return val;

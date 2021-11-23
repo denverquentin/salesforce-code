@@ -37,16 +37,14 @@ public with sharing class TestData {
 		}
 		insert user;
 
-		/* TODO: assign one of our permission sets to the user once it's defined
-		PermissionSet[] ps = [SELECT Id FROM PermissionSet WHERE Name = :Constants.UST_PERM_SET_API_NAME];
+		PermissionSet[] ps = [SELECT Id FROM PermissionSet WHERE Name = :Constants.PERM_SET_API_NAME];
 
 		if (ps.size() != 1) {
-			throw new Constants.UnexpectedException('Unable to find Permission Set: ' + Constants.UST_PERM_SET_API_NAME);
+			throw new Constants.UnexpectedException('Unable to find Permission Set: ' + Constants.PERM_SET_API_NAME);
 		} else {
 			PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = ps[0].Id, AssigneeId = user.Id);
 			Database.SaveResult sr = Database.insert(psa, false);
 		}
-		*/
 	}
 
 
@@ -59,9 +57,9 @@ public with sharing class TestData {
 		User user = new User();
 		user.FirstName = 'Test';
 		user.LastName = 'User';
-		user.Email = 'test@github.com';
-		user.UserName = 'test@github.com';
-		user.Alias = 'testuser';
+		user.Email = 'test1@github.com';
+		user.UserName = 'test1@github.com';
+		user.Alias = 'tuser1';
 		user.IsActive = true;
 		user.EmailEncodingKey = 'UTF-8';
 		user.LanguageLocaleKey = 'en_US';
