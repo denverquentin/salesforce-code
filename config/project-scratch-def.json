@@ -1,18 +1,76 @@
 {
-  "orgName": "Demo company",
-  "edition": "Developer",
-  "features": [],
-  "settings": {
-    "lightningExperienceSettings": {
-      "enableS1DesktopEnabled": true
-    },
-    "securitySettings": {
-      "passwordPolicies": {
-        "enableSetPasswordInApi": true
-      }
-    },
-    "mobileSettings": {
-      "enableS1EncryptedStoragePref2": false
-    }
-  }
+	"orgName" : "Code Dev Scratch Org",
+	"country" : "US",
+	"edition" : "Developer",
+	"adminEmail" : "quentinf@gmail.com",
+	"description" : "scratch org for code development",
+	"hasSampleData" : false,
+	"features" : [
+		"AuthorApex",
+		"ContactsToMultipleAccounts",
+		"DebugApex",
+		"ForceComPlatform",
+		"Sites",
+		"API",
+		"RecordTypes",
+		"PersonAccounts",
+		"ProviderFreePlatformCache",
+		"ServiceUser"
+	],
+	"settings" : {
+		"securitySettings" : {
+		"networkAccess" : {
+			"ipRanges" : [
+			{
+				"start" : "1.1.1.1",
+				"end" : "1.1.1.1",
+				"description" : "ip to whitelist"
+			}
+			]
+		},
+		"sessionSettings" : {
+			"sessionTimeout" : "TwelveHours",
+			"disableTimeoutWarning" : true,
+			"enableSMSIdentity" : false,
+			"identityConfirmationOnTwoFactorRegistrationEnabled" : false
+		}
+		},
+		"apexSettings" : {
+			"enableAggregateCodeCoverageOnly" : false,
+			"enableDisableParallelApexTesting" : false
+		},
+		"chatterSettings" : {
+			"enableChatter" : true
+		},
+		"enhancedNotesSettings" : {
+			"enableEnhancedNotes" : false
+		},
+		"entitlementSettings": {
+			"enableEntitlements": true
+		},
+		"languageSettings": {
+			"enableTranslationWorkbench": true
+		},
+		"lightningExperienceSettings" : {
+			"enableAuraCDNPref" : false,
+			"enableLexEndUsersNoSwitching" : false,
+			"enableS1DesktopEnabled" : true,
+			"enableTryLightningOptOut" : true,
+			"enableUsersAreLightningOnly" : false
+		},
+		"mobileSettings" : {
+			"enableS1OfflinePref" : false,
+			"enableS1EncryptedStoragePref2" : false
+		},
+		"nameSettings" : {
+			"enableMiddleName" : false,
+			"enableNameSuffix" : false
+		},
+		"socialProfileSettings" : {
+			"enableSocialProfiles" : false
+		},
+		"userManagementSettings": {
+			"enableNewProfileUI": true
+		}
+	}
 }
