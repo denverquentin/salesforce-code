@@ -52,7 +52,7 @@ jobs:
       # authenticate to SF dev hub
       - name: 'Authenticate to Salesforce Dev Hub'
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile .sf.key --setalias hub --setdefaultdevhubusername
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername
           sfdx force:org:list
 
 
