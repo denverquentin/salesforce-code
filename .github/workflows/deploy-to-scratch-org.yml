@@ -30,7 +30,7 @@ jobs:
       # https://github.com/actions/setup-node
       - uses: actions/checkout@v2
       - name: Installing Node.js v14
-      - uses: actions/setup-node@v2
+        uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: 'npm'
