@@ -63,63 +63,92 @@ sfdx auth:logout -u dev
 
 
 #### Create a Scratch Org (a Dev Hub is Required)
-- `sfdx auth:web:login --setalias devhub --setdefaultdevhubusername --instanceurl https://login.salesforce.com` \
 Authenticate to a devhub org with an alias = devhub and sets it as the default devhub org. The devhub org authentication is used to create scratch orgs and build packages. You only need to login to the devhub org once - you will remain authorized to the devhub org until you run the `sfdx auth:logout` command.
+```
+sfdx auth:web:login --setalias devhub --setdefaultdevhubusername --instanceurl https://login.salesforce.com
+```
 
-- `sfdx force:org:create -f config/project-scratch-def.json --durationdays 30 --setalias scratch --setdefaultusername --targetdevhubusername devhub adminEmail=quentin@github.com username=quentin@github.com.2021.10.31` \
 Change the `adminEmail` in the script above to your email address so you'll receive Apex errors and package install emails. Also change the `username` value to include your email address with something unique at the end. This command builds a scratch org that lasts 30 days with a *scratch* alias and sets it as your default org.
+```
+sfdx force:org:create -f config/project-scratch-def.json --durationdays 30 --setalias scratch --setdefaultusername --targetdevhubusername devhub adminEmail=quentin@github.com username=quentin@github.com.2021.10.31
+```
 
-- `sfdx force:source:deploy -u scratch -x manifest/package.xml` \
 Deploy all metadata defined in the manifest/package.xml to your Salesforce scratch org.
+```
+sfdx force:source:deploy -u scratch -x manifest/package.xml
+```
 
-- `sfdx force:user:permset:assign -n PermSet -u scratch` \
 Assign the a permission set named "PermSet" to your scratch org user.
+```
+sfdx force:user:permset:assign -n PermSet -u scratch
+```
 
-- `sfdx force:org:open -u scratch` \
 Open the Salesforce scratch org in a browser. You will not need to login since you are already authenticated in SFDX.
+```
+sfdx force:org:open -u scratch
+```
 
-- `sfdx force:user:password:generate -u scratch` \
 Generate a password for the scratch user you just created. You only need to do this if you want to let someone else login to your scratch org from a browser.
+```
+sfdx force:user:password:generate -u scratch
+```
 
-- `sfdx force:user:display -u scratch` \
 Display the scratch org password you generated with the previous command. You only need to do this if you want to let someone else login to your scratch org from a browser.
-
+```
+sfdx force:user:display -u scratch
+```
 
 #### Delete a Scratch Org
-- `sfdx force:org:delete -u scratch` \
 Deletes a scratch org named *scratch*. We have a limited number of scratch orgs so make it a habit to delete ones you no longer need so we don't run out.
-
+```
+sfdx force:org:delete -u scratch
+```
 
 #### Deploy (Push) Metadata to Org
-- `sfdx force:source:deploy -u dev -x manifest/package.xml` \
 Deploy (push) all metadata and code from the Git branch on your local computer to your SF dev org. Only metadata defined in manifest/package.xml is deployed.
+```
+sfdx force:source:deploy -u dev -x manifest/package.xml
+```
 
 
 #### Retrieve (Pull) Metadata from Org
-- `sfdx force:source:retrieve -u dev -x manifest/package.xml`\
 Retrieve (pull) all metadata and code defined in the manifest/package.xml from your SF dev org to your computer.
+```
+sfdx force:source:retrieve -u dev -x manifest/package.xml
+```
 
 
 #### Run All Tests
-- `sfdx force:apex:test:run -u dev --testlevel RunLocalTests --codecoverage --resultformat human` \
 Runs all unit tests in your dev org.
-
+```
+sfdx force:apex:test:run -u dev --testlevel RunLocalTests --codecoverage --resultformat human
+```
 
 #### Other
-- `sfdx force:limits:api:display -u devhub` \
 Display the API limits for the dev hub.
+```
+sfdx force:limits:api:display -u devhub
+```
 
-- `sfdx --version` \
 List the version of SFDX that you're using.
+```
+sfdx --version
+```
 
-- `sfdx config:list` \
 List all the config settings for SFDX.
+```
+sfdx config:list
+```
 
-- `sfdx update` \
 Update the SFDX CLI tool to the latest version.
+```
+sfdx update
+```
 
-- `sfdx plugins:update` \
 Update the SFDX plugins to the latest version.
+```
+sfdx plugins:update
+```
 
 
 ### Other Information

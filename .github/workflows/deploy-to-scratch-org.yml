@@ -51,6 +51,11 @@ jobs:
       - name: 'Lint Lightning Web Components'
         run: sfdx force:lightning:lint --exit .force-app/main/default/lwc
 
+      # source scanner - ignore Test classes
+      - name: 'Static Apex Class Analysis (excluding Test classes)'
+        run: sfdx scanner:run --target 'force-app/main/default/classes,!./**/*Test.cls'
+      # --format xml 
+
       # authenticate to SF dev hub
       - name: 'Authenticate to Salesforce Dev Hub'
         run: |
@@ -85,7 +90,7 @@ jobs:
 
       # delete the scratch org
       - name: 'Delete the Scratch Org'
-        run: sfdx force:org:delete -u scratch
+        run: sfdx force:org:delete -u scratch --noprompt
 
       # LOTS OF ERRORS WE CAN'T FIX WHEN TRYING TO INSTALL SFDX WITH NPM!
       # USING ABOVE METHOD INSTEAD FOR NOW
