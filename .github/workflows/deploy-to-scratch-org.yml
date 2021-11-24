@@ -27,19 +27,20 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # https://github.com/actions/setup-node
       - uses: actions/checkout@v2
+      - name: Installing Node.js v14
+      - uses: actions/setup-node@v2
         with:
-          ref: ${{ GitHub.ref }}
-          fetch-depth: 0
-        if: GitHub.event.action == 'opened' || GitHub.event.action == 'synchronize' || GitHub.event_name == 'push'
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '>=14'
-          check-latest: true
+          node-version: '14'
+          cache: 'npm'
+      - run: npm install
 
       # Install SFDX using Node
-      - name: Install SFDX (Salesforce CLI)
+      # SF sometimes has shitty buggy versions of their latest sfdx-cli that breaks
+      # can find an older + working version here - https://www.npmjs.com/package/sfdx-cli
+      - name: Install SFDX v7.127.0 (Salesforce CLI)
         run: |
-          npm install sfdx-cli
+          npm install sfdx-cli@7.127.0
           node_modules/sfdx-cli/bin/run --version
           node_modules/sfdx-cli/bin run plugins --core
