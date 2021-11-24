@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
+    # helpful doc: https://developer.salesforce.com/blogs/2020/01/using-salesforce-dx-with-github-actions
     steps:
       # Install Salesforce CLI
       - name: Install SFDX (Salesforce CLI)
@@ -39,8 +40,14 @@ jobs:
         run: |
           sfdx --version
           sfdx force
-          echo -e "dir"
 
+      # Checkout the code in the pull request
+      - name: 'Checkout Code'
+        uses: actions/checkout@v2
+
+      # ESlint
+      - name: 'Lint Lightning Web Components'
+        run: sfdx force:lightning:lint --exit .force-app/main/default/lwc
 
       # LOTS OF ERRORS WE CAN'T FIX WHEN TRYING TO INSTALL SFDX WITH NPM!
       # USING ABOVE METHOD INSTEAD FOR NOW
