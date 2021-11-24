@@ -40,8 +40,8 @@ jobs:
       # can find an older + working version here - https://www.npmjs.com/package/sfdx-cli
       # looks like we can add  --ignore-scripts to the sfdx-cli install line to ignore errors
       # open issues with SFDX - https://github.com/forcedotcom/cli/issues
-      - name: Install SFDX v7.126.0 (Salesforce CLI)
+      - name: Install SFDX v7.122.1 (Salesforce CLI)
         run: |
-          npm install sfdx-cli@7.126.0
+          npm install sfdx-cli@7.122.1
           node_modules/sfdx-cli/bin/run --version
           node_modules/sfdx-cli/bin run plugins --core
