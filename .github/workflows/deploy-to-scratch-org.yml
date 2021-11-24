@@ -53,10 +53,12 @@ jobs:
 
       # source scanner - ignore Test classes
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
+      # ,!./**/*Test.cls
       - name: 'Static Apex Class Analysis (excluding Test classes)'
         run: |
-          sfdx scanner:run --target 'force-app/main/default' --category=!Documentation --severity-threshold 2
-          # ,!./**/*Test.cls
+          sfdx scanner:run --target 'force-app/main/default' --category=!Documentation  --format=json --outfile scan.json --severity-threshold 2
+          echo scan.json
+
 
       # authenticate to SF dev hub
       - name: 'Authenticate to Salesforce Dev Hub'
