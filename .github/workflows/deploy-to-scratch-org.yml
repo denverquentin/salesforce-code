@@ -68,6 +68,7 @@ jobs:
       # healthcloud package version id = 04t4W000002g0as
       # http://industries.force.com/healthcloud
       - name: 'Install required Package in Scratch Org'
+        run: echo "coming soon!"
         # run: sfdx force:package:install --package 04t4W000002g0as -u scratch --securitytype AdminsOnly --wait 35 --noprompt
 
       # deploy code to the scratch org
