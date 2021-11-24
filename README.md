@@ -26,26 +26,40 @@ Here's a list of useful and common SFDX (the Salesforce CLI tool) commands you'l
 
 
 #### Org Authentication
-- `sfdx auth:web:login --setalias devhub --setdefaultdevhubusername --instanceurl https://login.salesforce.com` \
 Authenticate to a devhub org with an alias = devhub so SFDX is authorized to use it. The devhub authentication is used to build scratch orgs and build packages. You only need to authenticate to an org once.
+```
+sfdx auth:web:login --setalias devhub --setdefaultdevhubusername --instanceurl https://login.salesforce.com
+```
 
-- `sfdx auth:web:login --setalias dev --setdefaultusername --instanceurl https://test.salesforce.com` \
 Authenticate to a org with an alias = dev so SFDX is authorized to use it. You won't need to do this for scratch orgs - only permanent orgs. See instructions below on how to create a scratch org.
+```
+sfdx auth:web:login --setalias dev --setdefaultusername --instanceurl https://test.salesforce.com
+```
 
-- `sfdx config:set defaultusername=dev` \
 Set a default username for SFDX if you didn't do this during the auth:web:login.
+```
+sfdx config:set defaultusername=dev
+```
 
-- `sfdx config:set defaultdevhubusername=devhub` \
 Set a default dev hub username for SFDX if you didn't do this during the auth:web:login.
+```
+sfdx config:set defaultdevhubusername=devhub
+```
 
-- `sfdx force:org:list` \
 List all authorized orgs.
+```
+sfdx force:org:list
+```
 
-- `sfdx force:org:open -u scratch` \
 Open an authorized org in a browser.
+```
+sfdx force:org:open -u scratch
+```
 
-- `sfdx auth:logout -u dev` \
 Logout of an org so SFDX can no longer use it.
+```
+sfdx auth:logout -u dev
+```
 
 
 #### Create a Scratch Org (a Dev Hub is Required)

@@ -6,7 +6,7 @@ name: Deploy To Scratch Org
 on:
   # Triggers the workflow on push or pull request events but only for the master branch and if something changes in our metadata directory
   push:
-    branches: [ master, dev, feature/* ]
+    branches: [ master, dev, feature/** ]
     paths:
       - 'force-app/**'
   pull_request:
@@ -28,20 +28,20 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     # helpful doc: https://developer.salesforce.com/blogs/2020/01/using-salesforce-dx-with-github-actions
     steps:
-      # install sfdx
+      # install sfdx & source scanner plugin
       - name: Install SFDX (Salesforce CLI)
         run: |
           wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
           mkdir sfdx-cli
           tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
           ./sfdx-cli/install
+          sfdx plugins:install @salesforce/sfdx-scanner
 
       - name: Output SFDX Version
         run: |
           sfdx --version
           sfdx force
-          echo "GITHUB_RUN_ID = $GITHUB_RUN_ID"
-          echo "GITHUB_RUN_NUMBER = $GITHUB_RUN_NUMBER"
+          sfdx plugins
 
       # checkout the code in the pull request or commit
       - name: 'Checkout Code'
@@ -60,7 +60,7 @@ jobs:
       # create a scratch org
       - name: 'Create a Scratch Org'
         run: |
-          sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID"
+          sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER"
           sfdx force:user:password:generate -u scratch
           sfdx force:user:display -u scratch
 
