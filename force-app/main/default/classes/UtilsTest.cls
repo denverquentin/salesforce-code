@@ -170,7 +170,7 @@ private class UtilsTest {
 		System.assertEquals('80808', Utils.formatPostalCode('80808'));
 		System.assertEquals('90909-1234', Utils.formatPostalCode('909091234'));
 		try {
-			String v = Utils.formatPostalCode('9090966666');
+			Utils.formatPostalCode('9090966666');
 		} catch (Exception e) {
 			System.assert(String.isNotBlank(e.getMessage()));
 		}
