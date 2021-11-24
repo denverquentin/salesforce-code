@@ -33,13 +33,15 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
+          cache: 'npm'
       - run: npm install
 
       # Install SFDX using Node
       # SF sometimes has shitty buggy versions of their latest sfdx-cli that breaks
       # can find an older + working version here - https://www.npmjs.com/package/sfdx-cli
+      # open issues with SFDX - https://github.com/forcedotcom/cli/issues
       - name: Install SFDX v7.127.0 (Salesforce CLI)
         run: |
-          npm install sfdx-cli@7.127.0
+          npm install sfdx-cli@7.126.0
           node_modules/sfdx-cli/bin/run --version
           node_modules/sfdx-cli/bin run plugins --core
