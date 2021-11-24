@@ -52,9 +52,14 @@ jobs:
         run: sfdx force:lightning:lint --exit .force-app/main/default/lwc
 
       # source scanner - ignore Test classes
+      # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
       - name: 'Static Apex Class Analysis (excluding Test classes)'
-        run: sfdx scanner:run --target 'force-app/main/default/classes,!./**/*Test.cls'
-      # --format xml 
+        run: |
+         sfdx scanner:run --target 'force-app/main/default,!./**/*Test.cls --category=!Documentation' --severity-threshold 2
+# --format junit --outfile source-scan-results.xml
+#         if [ -f ./testresults.xml ]; then
+#            exit 1
+#          fi
 
       # authenticate to SF dev hub
       - name: 'Authenticate to Salesforce Dev Hub'
