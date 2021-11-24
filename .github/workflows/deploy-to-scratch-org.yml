@@ -6,11 +6,12 @@ name: Deploy To Scratch Org
 on:
   # Triggers the workflow on push or pull request events but only for the master branch and if something changes in our metadata directory
   push:
-    branches: [ master ]
+    branches: [ master, dev, feature/* ]
     paths:
       - 'force-app/**'
   pull_request:
-    branches: [ master ]
+    types: [opened, synchronized, reopened]
+    branches: [ dev ]
     paths:
       - 'force-app/**'
 
@@ -26,22 +27,40 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # Install Salesforce CLI
+      - name: Install SFDX (Salesforce CLI)
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+          mkdir sfdx-cli
+          tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+          ./sfdx-cli/install
+
+      - name: Output SFDX Version
+        run: |
+          sfdx --version
+          sfdx force
+          echo -e "dir"
+
+
+      # LOTS OF ERRORS WE CAN'T FIX WHEN TRYING TO INSTALL SFDX WITH NPM!
+      # USING ABOVE METHOD INSTEAD FOR NOW
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       # https://github.com/actions/setup-node
-      - uses: actions/checkout@v2
-      - name: Installing Node.js v14
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - run: npm install
+      #- uses: actions/checkout@v2
+      #- name: Installing Node.js v14
+      #  uses: actions/setup-node@v2
+      #  with:
+      #    node-version: '14'
+      #- run: npm install
 
       # Install SFDX using Node
       # SF sometimes has shitty buggy versions of their latest sfdx-cli that breaks
       # can find an older + working version here - https://www.npmjs.com/package/sfdx-cli
       # looks like we can add  --ignore-scripts to the sfdx-cli install line to ignore errors
       # open issues with SFDX - https://github.com/forcedotcom/cli/issues
-      - name: Install SFDX v7.127.0 (Salesforce CLI)
-        run: |
-          npm install sfdx-cli@7.127.0 --ignore-scripts
-          node_modules/sfdx-cli/bin/run --version
-          node_modules/sfdx-cli/bin run plugins --core
+      #- name: Install SFDX v7.127.0 (Salesforce CLI)
+      #  run: |
+      #    npm install sfdx-cli@7.127.0 --ignore-scripts
+      #    node_modules/sfdx-cli/bin/run --version
+      #    node_modules/sfdx-cli/bin run plugins --core
