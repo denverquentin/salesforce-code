@@ -57,7 +57,7 @@ jobs:
       - name: 'Static Apex Class Analysis (excluding Test classes)'
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation  --format=json --outfile=scan.json --severity-threshold=2
-          echo $(cat scan.json)
+          echo "scan.json = $(cat scan.json)"
 
 # echo "scan.json = " > scan.json
 # echo $(cat scan.json)
@@ -72,7 +72,8 @@ jobs:
         run: |
           sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER"
           sfdx force:user:password:generate -u scratch
-          sfdx force:user:display -u scratch
+          sfdx force:user:display -u scratch --json > sfuser.json
+          echo "sfuser.json = $(cat sfuser.json)"
 
       # install required package in the scratch org
       # healthcloud package version id = 04t4W000002g0as
@@ -91,7 +92,8 @@ jobs:
 
       # run all tests in the scratch org
       - name: 'Run All Tests in Scratch Org'
-        run: sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat human
+        run: sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat json > sftestresults.json
+        echo "sftestresults.json = $(cat sftestresults.json)"
 
       # delete the scratch org
       - name: 'Delete the Scratch Org'
