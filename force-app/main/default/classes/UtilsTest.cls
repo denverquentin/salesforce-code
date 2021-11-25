@@ -83,7 +83,7 @@ private class UtilsTest {
 		String fileContents = 'hello there. how are you?';
 
 		Id fileId = Utils.createFileAttachedToRecord(Blob.valueOf(fileContents), a.Id, 'hello.txt');
-		//System.assert(fileId != null);
+		System.assert(fileId != null);
 	}
 
 
