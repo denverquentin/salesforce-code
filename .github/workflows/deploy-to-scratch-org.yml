@@ -56,10 +56,11 @@ jobs:
       # ,!./**/*Test.cls
       - name: 'Static Apex Class Analysis (excluding Test classes)'
         run: |
-          sfdx scanner:run --target force-app/main/default --category !Documentation  --format json --outfile scan.json --severity-threshold 2
-          $(cat scan.json)
+          sfdx scanner:run --target=force-app/main/default --category=!Documentation  --format=json --outfile=scan.json --severity-threshold=2
+          echo $(cat scan.json)
 
-
+# echo "scan.json = " > scan.json
+# echo $(cat scan.json)
       # authenticate to SF dev hub
       - name: 'Authenticate to Salesforce Dev Hub'
         run: |
