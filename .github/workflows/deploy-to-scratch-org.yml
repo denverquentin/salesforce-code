@@ -70,7 +70,7 @@ jobs:
         run: |
           sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER"
           sfdx force:user:password:generate -u scratch
-          sfuser.json=$(sfdx force:user:display -u scratch --json)
+          sfdx force:user:display -u scratch --json | sfuser.json
           echo "sfuser.json = $(cat sfuser.json)"
 
       # install required package in the scratch org
