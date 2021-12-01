@@ -70,7 +70,7 @@ jobs:
         run: |
           sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER"
           sfdx force:user:password:generate -u scratch
-          sfdx force:user:display -u scratch --json | sfuser.json
+          sfdx force:user:display -u scratch --json > sfuser.json
           echo "sfuser.json = $(cat sfuser.json)"
 
       # install required package in the scratch org
@@ -93,6 +93,16 @@ jobs:
         run: |
           sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat json > sftestresults.json
           echo "sftestresults.json = $(cat sftestresults.json)"
+
+      # send notification to Teams channel using the ms-teams-notification action
+      - name: Send notification to Teams channel
+        uses: jdcargile/ms-teams-notification@v1.3
+        with:
+          github-token: ${{ github.token }} # this will use the runner's token.
+          ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
+          notification-summary: Yay! Can send SF scratch org logins to Teams channel
+          notification-color: 28a745
+          timezone: America/Denver
 
       # delete the scratch org
       - name: 'Delete the Scratch Org'

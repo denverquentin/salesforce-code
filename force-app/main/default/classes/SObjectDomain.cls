@@ -13,6 +13,25 @@
  *
  **/
 public virtual with sharing class SObjectDomain {
+	// Retains instances of domain classes implementing trigger stateful
+	private static Map<Type,List<SObjectDomain>> triggerStateByClass;
+
+	// Retains the trigger tracking configuration used for each domain
+	private static Map<Type,TriggerEvent> triggerEventByClass;
+
+	// Useful during unit testing to assert at a more granular and robust level for errors raised during the various trigger events
+	public static ErrorFactory errors {get; private set;}
+
+	// Useful during unit testing to access mock support for database inserts and udpates (testing without DML)
+	public static TestFactory test {get; private set;}
+
+	static {
+		errors = new ErrorFactory();
+		test = new TestFactory();
+		triggerStateByClass = new Map<Type,List<SObjectDomain>>();
+		triggerEventByClass = new Map<Type,TriggerEvent>();
+	}
+
 	// Provides access to the data represented by this domain class
 	public List<SObject> records { get; private set;}
 
@@ -21,25 +40,6 @@ public virtual with sharing class SObjectDomain {
 
 	// Exposes the configuration for this domain class instance
 	public Configuration configuration {get; private set;}
-
-	// Useful during unit testing to assert at a more granular and robust level for errors raised during the various trigger events
-	public static ErrorFactory errors {get; private set;}
-
-	// Useful during unit testing to access mock support for database inserts and udpates (testing without DML)
-	public static TestFactory test {get; private set;}
-
-	// Retains instances of domain classes implementing trigger stateful
-	private static Map<Type,List<SObjectDomain>> triggerStateByClass;
-
-	// Retains the trigger tracking configuration used for each domain
-	private static Map<Type,TriggerEvent> triggerEventByClass;
-
-	static {
-		errors = new ErrorFactory();
-		test = new TestFactory();
-		triggerStateByClass = new Map<Type,List<SObjectDomain>>();
-		triggerEventByClass = new Map<Type,TriggerEvent>();
-	}
 
 	/**
 	 * Constructs the domain class with the data on which to apply the behavior implemented within

@@ -43,7 +43,7 @@ public with sharing class TestData {
 			throw new Constants.UnexpectedException('Unable to find Permission Set: ' + Constants.PERM_SET_API_NAME);
 		} else {
 			PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = ps[0].Id, AssigneeId = user.Id);
-			Database.SaveResult sr = Database.insert(psa, false);
+			Database.insert(psa, false);
 		}
 	}
 

@@ -8,9 +8,9 @@ private class AccessTest {
 		Utils.log('Access.isUpdateable(Account.SObjectType) = ' + Access.isUpdateable(Account.SObjectType));
 		Utils.log('Access.isDeleteable(Account.SObjectType) = ' + Access.isDeleteable(Account.SObjectType));
 
-		Boolean x = Access.isFieldAccessible(Account.Name);
-		Boolean y = Access.isFieldCreateable(Account.Name);
-		Boolean z = Access.isFieldUpdateable(Account.Name);
+		Access.isFieldAccessible(Account.Name);
+		Access.isFieldCreateable(Account.Name);
+		Access.isFieldUpdateable(Account.Name);
 
 		System.assertEquals('', Access.getEnglishForAccessType(null));
 		System.assertEquals('Read', Access.getEnglishForAccessType(AccessType.READABLE));
@@ -57,7 +57,7 @@ private class AccessTest {
 			Access.checkPermissions(AccessType.UPDATABLE, new List<Account> {a}, fieldsToCheck);
 
 		} catch (Exception e) {
-
+			Utils.logError(e);
 		}
 	}
 
@@ -89,7 +89,7 @@ private class AccessTest {
 			Access.checkPermissions(AccessType.UPDATABLE, new List<Account> {a}, fieldsToValue.keySet());
 
 		} catch (Exception e) {
-
+			Utils.logError(e);
 		}
 	}
 

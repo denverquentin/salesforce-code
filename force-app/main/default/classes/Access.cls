@@ -4,9 +4,9 @@ public inherited sharing class Access {
 	// and we'll use the isAccessible methods to check standard objects and fields that may not be accessible/createable/updateable
 	// so we know if they should be queried or upserted
 
-	public virtual class AccessException extends Exception { }
-
 	private static final String FIX_MSG = ' You can fix this error by assigning the correct Permission Set to the User or updating their Profile.';
+
+	public virtual class AccessException extends Exception { }
 
 	/*
 	throws exception if the user doesn't have the right access on the object OR if the fields passed into the method don't have access.

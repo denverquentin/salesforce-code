@@ -1,9 +1,9 @@
 public inherited sharing class Constants {
-	public class ValidationException extends Exception {}
-	public class UnexpectedException extends Exception {}
-
 	public static final String PROFILE_NAME_SYSTEM_ADMINISTRATOR = 'System Administrator';
 	public static final String PERM_SET_API_NAME = 'PermSet';
+
+	public class ValidationException extends Exception {}
+	public class UnexpectedException extends Exception {}
 
 	/* useful if we start using record types
 	private static final Map<String,Schema.RecordTypeInfo> accountRecordTypes = Schema.SObjectType.Account.getRecordTypeInfosByName();

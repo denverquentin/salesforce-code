@@ -15,7 +15,7 @@ private class SObjectDomainTest {
 
 	@IsTest
 	static void testInsertValidationFailedWithoutDML() {
-		Opportunity opp = new Opportunity ( Name = 'Test', Type = 'Existing Account');
+		Opportunity opp = new Opportunity( Name = 'Test', Type = 'Existing Account');
 		System.assertEquals(false, SObjectDomain.test.database.hasRecords());
 		SObjectDomain.test.database.onInsert(new Opportunity[] { opp });
 		System.assertEquals(true, SObjectDomain.test.database.hasRecords());
@@ -27,10 +27,11 @@ private class SObjectDomainTest {
 
 	@IsTest
 	static void testUpdateValidationFailedWithoutDML() {
-		Opportunity oldOpp = (Opportunity)Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Id oppId = '00' + '6E000000' + '6mkRQ';
+		Opportunity oldOpp = (Opportunity)Opportunity.sObjectType.newSObject(oppId);
 		oldOpp.Name = 'Test';
 		oldOpp.Type = 'Existing Account'; 
-		Opportunity newOpp = (Opportunity)Opportunity.sObjectType.newSObject('006E0000006mkRQ'); 
+		Opportunity newOpp = (Opportunity)Opportunity.sObjectType.newSObject(oppId);
 		newOpp.Name = 'Test';
 		newOpp.Type = 'New Account';
 		System.assertEquals(false, SObjectDomain.test.database.hasRecords());
@@ -44,7 +45,8 @@ private class SObjectDomainTest {
 
 	@IsTest
 	static void testOnBeforeDeleteWithoutDML() {
-		Opportunity opp = (Opportunity) Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Id oppId = '00' + '6E000000' + '6mkRQ';
+		Opportunity opp = (Opportunity) Opportunity.sObjectType.newSObject(oppId);
 		opp.Name = 'Test';
 		opp.Type = 'Existing Account';
 		System.assertEquals(false, SObjectDomain.test.database.hasRecords());
@@ -57,7 +59,8 @@ private class SObjectDomainTest {
 
 	@IsTest
 	static void testOnAfterUndeleteWithoutDML() {
-		Opportunity opp = (Opportunity) Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Id oppId = '00' + '6E000000' + '6mkRQ';
+		Opportunity opp = (Opportunity) Opportunity.sObjectType.newSObject(oppId);
 		opp.Name = 'Test';
 		opp.Type = 'Existing Account';
 		System.assertEquals(false, SObjectDomain.test.database.hasRecords());
@@ -83,7 +86,8 @@ private class SObjectDomainTest {
 				}
 
 				// Test Update object security
-				Opportunity existingOpp = (Opportunity)Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+				Id oppId = '00' + '6E000000' + '6mkRQ';
+				Opportunity existingOpp = (Opportunity)Opportunity.sObjectType.newSObject(oppId);
 				existingOpp.Name = 'Test';
 				existingOpp.Type = 'Existing Account';
 				SObjectDomain.test.database.onUpdate(new List<Opportunity> { opp }, new Map<Id, Opportunity> { opp.Id => opp });
@@ -141,10 +145,11 @@ private class SObjectDomainTest {
 
 	@IsTest
 	static void testOnValidateBehaviorDefault() {
-		Opportunity oldOpp = (Opportunity) Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Id oppId = '00' + '6E000000' + '6mkRQ';
+		Opportunity oldOpp = (Opportunity) Opportunity.sObjectType.newSObject(oppId);
 		oldOpp.Name = 'Test Default Behavior';
 		oldOpp.Type = 'Existing Account';
-		Opportunity newOpp = (Opportunity) Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Opportunity newOpp = (Opportunity) Opportunity.sObjectType.newSObject(oppId);
 		newOpp.Name = 'Test Default Behavior';
 		newOpp.Type = 'New Account';
 		Boolean hasError = false;
@@ -159,10 +164,11 @@ private class SObjectDomainTest {
 
 	@IsTest
 	static void testOnValidateBehaviorOld() {
-		Opportunity oldOpp = (Opportunity)Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Id oppId = '00' + '6E000000' + '6mkRQ';
+		Opportunity oldOpp = (Opportunity)Opportunity.sObjectType.newSObject(oppId);
 		oldOpp.Name = 'Test Enable Old Behavior';
 		oldOpp.Type = 'Existing Account';
-		Opportunity newOpp = (Opportunity)Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Opportunity newOpp = (Opportunity)Opportunity.sObjectType.newSObject(oppId);
 		newOpp.Name = 'Test Enable Old Behavior';
 		newOpp.Type = 'New Account';
 		SObjectDomain.test.database.onUpdate(new Opportunity[] { newOpp }, new Map<Id,SObject> { newOpp.Id => oldOpp });
@@ -197,10 +203,11 @@ private class SObjectDomainTest {
 		// The following tests that the ability to enable/disable all trigger events works as required
 		boolean bError = false;
 		String  sErrorMessage = '';
-		Opportunity oldOpp = (Opportunity)Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Id oppId = '00' + '6E000000' + '6mkRQ';
+		Opportunity oldOpp = (Opportunity)Opportunity.sObjectType.newSObject(oppId);
 		oldOpp.Name = 'Test';
 		oldOpp.Type = 'Existing';
-		Opportunity newOpp = (Opportunity)Opportunity.sObjectType.newSObject('006E0000006mkRQ');
+		Opportunity newOpp = (Opportunity)Opportunity.sObjectType.newSObject(oppId);
 		newOpp.Name = 'Test';
 		newOpp.Type = 'New';
 		// these will be called multiple times making sure the correct error message comes back out

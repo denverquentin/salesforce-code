@@ -17,7 +17,7 @@ private class UtilsTest {
 		try {
 			Utils.errorLightning(new Constants.UnexpectedException('unexpected exception'));
 		} catch (AuraHandledException e) {
-
+			Utils.logError(e);
 		}
 
 		Utils.log(new Account());
@@ -27,7 +27,7 @@ private class UtilsTest {
 		System.assertEquals(Utils.isStateCountryPickListsEnabled(), Utils.isStateCountryPickListsEnabled());
 
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
-			Boolean val = Utils.isSysAdmin();
+			Utils.log('val = '+ Utils.isSysAdmin());
 		}
 	}
 
