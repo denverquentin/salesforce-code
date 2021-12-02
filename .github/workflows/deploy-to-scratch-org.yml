@@ -73,8 +73,8 @@ jobs:
           sfdx force:user:display -u scratch --json > sfuser.json
           echo "sfuser.json = $(cat sfuser.json)"
 
-      # build a sf login url for the scratch org
-      - name: Build Scratch Org Login Url
+      # parse out info we'll need to login to the sf scratch org
+      - name: Parse Scratch Org Login Info
         id: scratchorg
         run: |
           display=$(cat sfuser.json | jq '.result')
@@ -87,22 +87,12 @@ jobs:
           echo "::set-output name=loginurl::${instanceUrl}?un=${username}&pw="
           echo "::set-output name=password::${password}"
 
-      #loginUrl=$(jq -r  '.loginUrl' <<< "${display}")
-      #echo "loginUrl = ${loginUrl}"
-        # TODO: HAVE TO MAKE THE PARAMS ABOVE READABLE IN LOWER SCRIPTS
-        # make file executable
-        #chmod +x .github/workflows/encode-url.sh
-        # run script
-        #encodedpassword=.github/workflows/encode-url.sh "${password}"
-        #echo "encodedpassword = ${encodedpassword}"
-
       # https://github.com/marketplace/actions/execute-javascript-inline
       # To use latest action, specify "release-master" instead of "v0.0.2"
-      - name: Encode Password
+      - name: Build Scratch Org Login
         uses: satackey/action-js-inline@v0.0.2
         id: getdata
         with:
-          # Edit the following line to install packages required to run your script.
           script: |
             const core = require('@actions/core');
             console.log(`pwd: ${{ steps.scratchorg.outputs.password }}`);
@@ -112,8 +102,8 @@ jobs:
             const sfloginurl = `${{ steps.scratchorg.outputs.loginurl }}` + encodedpwd;
             console.log("sfloginurl = " + sfloginurl);
             // urls are supported in markdown only - no html
-            const sfloginmsg = "You can test the feature from this PR in this [Scratch Org](" + sfloginurl + ")";
-            //const sfloginmsg = "<a href='" + sfloginurl + "'>Login to Scratch Org To Test Feature</a>";
+            //const sfloginmsg = "You can test the feature from this PR in this [Scratch Org](" + sfloginurl + ")";
+            const sfloginmsg = "<a href='" + sfloginurl + "'>Scratch Org Login To Test Feature</a>";
             core.setOutput('sfloginmsg', sfloginmsg);
 
       # install required package in the scratch org
