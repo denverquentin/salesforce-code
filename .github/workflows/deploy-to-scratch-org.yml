@@ -111,10 +111,8 @@ jobs:
             console.log("encodedpwd = " + encodedpwd);
             const sfloginurl = `${{ steps.scratchorg.outputs.loginurl }}` + encodedpwd;
             console.log("sfloginurl = " + sfloginurl);
-            core.setOutput('sfloginurl', sfloginurl);
-
-      # You can use datas as ${{ steps.getdata.outputs.sfloginurl }} and ${{ steps.getdata.outputs.sfloginurl }}
-
+            const sfloginmsg = "<a href='" + sfloginurl + "'>Login to Scratch Org To Test Feature</a>";
+            core.setOutput('sfloginmsg', sfloginmsg);
 
       # install required package in the scratch org
       # healthcloud package version id = 04t4W000002g0as
@@ -138,12 +136,13 @@ jobs:
           echo "sftestresults.json = $(cat sftestresults.json)"
 
       # send notification to Teams channel using the ms-teams-notification action
+      # https://github.com/marketplace/actions/microsoft-teams-notification
       - name: Send Notification to Teams Channel
         uses: jdcargile/ms-teams-notification@v1.3
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-          notification-summary: ${{ steps.getdata.outputs.sfloginurl }}
+          notification-summary: ${{ steps.getdata.outputs.sfloginmsg }}
           notification-color: 28a745
           timezone: America/Denver
 
