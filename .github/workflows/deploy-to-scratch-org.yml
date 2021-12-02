@@ -103,19 +103,17 @@ jobs:
         id: getdata
         with:
           # Edit the following line to install packages required to run your script.
-          #required-packages: axios
           script: |
             const core = require('@actions/core');
             console.log(`pwd: ${{ steps.scratchorg.outputs.password }}`);
             console.log(`loginurl: ${{ steps.scratchorg.outputs.loginurl }}`);
             const encodedpwd = encodeURI(`${{ steps.scratchorg.outputs.password }}`);
             console.log("encodedpwd = " + encodedpwd);
+            const sfloginurl = `${{ steps.scratchorg.outputs.loginurl }}` + encodedpwd;
+            console.log("sfloginurl = " + sfloginurl);
+            core.setOutput('sfloginurl', sfloginurl);
 
-        #const axios = require('axios');
-#            core.setOutput('sfloginurl', ${{ steps.scratchorg.outputs.loginurl }} + encodedpwd);
-      # You can use datas as ${{ steps.getdata.outputs.encodedpwd }} and ${{ steps.getdata.outputs.sfloginurl }}
-#            //const sfloginurl = `${loginUrl}?un=${username}&pw=` + encodedpwd;
- #           console.log(sfloginurl);
+      # You can use datas as ${{ steps.getdata.outputs.sfloginurl }} and ${{ steps.getdata.outputs.sfloginurl }}
 
 
       # install required package in the scratch org
