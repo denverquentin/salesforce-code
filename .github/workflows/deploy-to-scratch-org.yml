@@ -44,29 +44,29 @@ jobs:
           sfdx plugins
 
       # checkout the code in the pull request or commit
-      - name: 'Checkout Code'
+      - name: Checkout Code
         uses: actions/checkout@v2
 
       # lint javascript for lwc's
-      - name: 'Lint Lightning Web Components'
+      - name: Lint Lightning Web Components
         run: sfdx force:lightning:lint --exit .force-app/main/default/lwc
 
       # source scanner - ignore Test classes
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
       # ,!./**/*Test.cls
-      - name: 'Static Apex Class Analysis (excluding Test classes)'
+      - name: Static Apex Class Analysis (excluding Test classes)
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation  --format=json --outfile=scan.json --severity-threshold=2
           echo "scan.json = $(cat scan.json)"
 
       # authenticate to SF dev hub
-      - name: 'Authenticate to Salesforce Dev Hub'
+      - name: Authenticate to Salesforce Dev Hub
         run: |
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername
           sfdx force:org:list
 
       # create a scratch org
-      - name: 'Create a Scratch Org'
+      - name: Create a Scratch Org
         run: |
           sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER"
           sfdx force:user:password:generate -u scratch
@@ -74,7 +74,7 @@ jobs:
           echo "sfuser.json = $(cat sfuser.json)"
 
       # build a sf login url for the scratch org
-      - name: 'Build Scratch Org Login Url'
+      - name: Build Scratch Org Login Url
         id: scratchorg
         run: |
           display=$(cat sfuser.json | jq '.result')
@@ -95,6 +95,7 @@ jobs:
           #encodedpassword=.github/workflows/encode-url.sh "${password}"
           #echo "encodedpassword = ${encodedpassword}"
 
+      # https://github.com/marketplace/actions/execute-javascript-inline
       # To use latest action, specify "release-master" instead of "v0.0.2"
       - name: Encode Password
         uses: satackey/action-js-inline@v0.0.2
@@ -107,10 +108,10 @@ jobs:
             const axios = require('axios')
 
             console.log(`pwd: ${{ steps.scratchorg.outputs.password }}`);
-            const encodedpwd = encodeURI(`${{ steps.scratchorg.outputs.password }}`);
-            console.log(encodedpwd);
+#            const encodedpwd = encodeURI(`${{ steps.scratchorg.outputs.password }}`);
+#            console.log(encodedpwd);
 
-            core.setOutput('sfloginurl', ${{ steps.scratchorg.outputs.loginurl }} + encodedpwd);
+#            core.setOutput('sfloginurl', ${{ steps.scratchorg.outputs.loginurl }} + encodedpwd);
       # You can use datas as ${{ steps.getdata.outputs.encodedpwd }} and ${{ steps.getdata.outputs.sfloginurl }}
 #            //const sfloginurl = `${loginUrl}?un=${username}&pw=` + encodedpwd;
  #           console.log(sfloginurl);
@@ -119,20 +120,20 @@ jobs:
       # install required package in the scratch org
       # healthcloud package version id = 04t4W000002g0as
       # http://industries.force.com/healthcloud
-      - name: 'Install required Package in Scratch Org'
+      - name: Install required Package in Scratch Org
         run: echo "coming soon!"
         # run: sfdx force:package:install --package 04t4W000002g0as -u scratch --securitytype AdminsOnly --wait 35 --noprompt
 
       # deploy code to the scratch org
-      - name: 'Deploy Code to Scratch Org'
+      - name: Deploy Code to Scratch Org
         run: sfdx force:source:deploy -u scratch -x manifest/package.xml
 
       # assign the permission set
-      - name: 'Assign Permission Set to Scratch Org User'
+      - name: Assign Permission Set to Scratch Org User
         run: sfdx force:user:permset:assign -n PermSet -u scratch
 
       # run all tests in the scratch org
-      - name: 'Run All Tests in Scratch Org'
+      - name: Run All Tests in Scratch Org
         run: |
           sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat json > sftestresults.json
           echo "sftestresults.json = $(cat sftestresults.json)"
@@ -148,28 +149,5 @@ jobs:
           timezone: America/Denver
 
       # delete the scratch org
-      #- name: 'Delete the Scratch Org'
+      #- name: Delete the Scratch Org
       #  run: sfdx force:org:delete -u scratch --noprompt
-
-      # LOTS OF ERRORS WE CAN'T FIX WHEN TRYING TO INSTALL SFDX WITH NPM!
-      # USING ABOVE METHOD INSTEAD FOR NOW
-
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      # https://github.com/actions/setup-node
-      #- uses: actions/checkout@v2
-      #- name: Installing Node.js v14
-      #  uses: actions/setup-node@v2
-      #  with:
-      #    node-version: '14'
-      #- run: npm install
-
-      # Install SFDX using Node
-      # SF sometimes has shitty buggy versions of their latest sfdx-cli that breaks
-      # can find an older + working version here - https://www.npmjs.com/package/sfdx-cli
-      # looks like we can add  --ignore-scripts to the sfdx-cli install line to ignore errors
-      # open issues with SFDX - https://github.com/forcedotcom/cli/issues
-      #- name: Install SFDX v7.127.0 (Salesforce CLI)
-      #  run: |
-      #    npm install sfdx-cli@7.127.0 --ignore-scripts
-      #    node_modules/sfdx-cli/bin/run --version
-      #    node_modules/sfdx-cli/bin run plugins --core
