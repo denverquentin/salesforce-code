@@ -73,6 +73,25 @@ jobs:
           sfdx force:user:display -u scratch --json > sfuser.json
           echo "sfuser.json = $(cat sfuser.json)"
 
+      # build a sf login url for the scratch org
+      - name: 'Build Scratch Org Login Url'
+        run: |
+          display=$(cat sfuser.json | jq '.result')
+          loginUrl=$(jq -r  '.loginUrl' <<< "${display}")
+          username=$(jq -r  '.username' <<< "${display}")
+          password=$(jq -r  '.password' <<< "${display}")
+          echo "loginUrl = ${loginUrl}"
+          echo "username = ${username}"
+          echo "password = ${password}"
+          # make file executable
+          chmod +x .github/workflows/encode-url.sh
+          # run script
+          encodedpassword=.github/workflows/encode-url.sh "${password}"
+          echo "encodedpassword = ${encodedpassword}"
+          sfloginurl="${loginUrl}?un=${username}&pw=${encodedpassword}"
+          echo -e "${sfloginurl}"
+
+
       # install required package in the scratch org
       # healthcloud package version id = 04t4W000002g0as
       # http://industries.force.com/healthcloud
@@ -95,12 +114,12 @@ jobs:
           echo "sftestresults.json = $(cat sftestresults.json)"
 
       # send notification to Teams channel using the ms-teams-notification action
-      - name: Send notification to Teams channel
+      - name: Send Notification to Teams Channel
         uses: jdcargile/ms-teams-notification@v1.3
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-          notification-summary: Yay! Can send SF scratch org logins to Teams channel
+          notification-summary: ${sfloginurl}
           notification-color: 28a745
           timezone: America/Denver
 
