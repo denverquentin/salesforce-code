@@ -78,14 +78,16 @@ jobs:
         id: scratchorg
         run: |
           display=$(cat sfuser.json | jq '.result')
-          loginUrl=$(jq -r  '.loginUrl' <<< "${display}")
+      #loginUrl=$(jq -r  '.loginUrl' <<< "${display}")
+          instanceUrl=$(jq -r  '.instanceUrl' <<< "${display}")
           username=$(jq -r  '.username' <<< "${display}")
           password=$(jq -r  '.password' <<< "${display}")
-          echo "loginUrl = ${loginUrl}"
+      #echo "loginUrl = ${loginUrl}"
+          echo "instanceUrl = ${instanceUrl}"
           echo "username = ${username}"
           echo "password = ${password}"
 
-          echo "::set-output name=loginurl::${loginUrl}?un=${username}&pw="
+          echo "::set-output name=loginurl::${instanceUrl}?un=${username}&pw="
           echo "::set-output name=password::${password}"
 
           # TODO: HAVE TO MAKE THE PARAMS ABOVE READABLE IN LOWER SCRIPTS
@@ -105,8 +107,9 @@ jobs:
           #required-packages: axios
           script: |
             const core = require('@actions/core');
-            console.log("pwd: ${{ steps.scratchorg.outputs.password }}");
-            const encodedpwd = encodeURI(${{ steps.scratchorg.outputs.password }});
+            console.log(`pwd: ${{ steps.scratchorg.outputs.password }}`);
+            console.log(`loginurl: ${{ steps.scratchorg.outputs.loginurl }}`);
+            const encodedpwd = encodeURI(`${{ steps.scratchorg.outputs.password }}`);
             console.log("encodedpwd = " + encodedpwd);
 
         #const axios = require('axios');
