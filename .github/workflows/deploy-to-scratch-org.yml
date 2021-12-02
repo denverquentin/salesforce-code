@@ -84,12 +84,30 @@ jobs:
           echo "username = ${username}"
           echo "password = ${password}"
           # make file executable
-          chmod +x .github/workflows/encode-url.sh
+          #chmod +x .github/workflows/encode-url.sh
           # run script
-          encodedpassword=.github/workflows/encode-url.sh "${password}"
-          echo "encodedpassword = ${encodedpassword}"
-          sfloginurl="${loginUrl}?un=${username}&pw=${encodedpassword}"
-          echo -e "${sfloginurl}"
+          #encodedpassword=.github/workflows/encode-url.sh "${password}"
+          #echo "encodedpassword = ${encodedpassword}"
+
+      # To use latest action, specify "release-master" instead of "v0.0.2"
+      - name: Encode Password
+        uses: satackey/action-js-inline@v0.0.2
+        id: getdata
+        with:
+        # Edit the following line to install packages required to run your script.
+        required-packages: axios
+        script: |
+          const core = require('@actions/core')
+          const axios = require('axios')
+
+          console.log(`branch: ${password}`);
+          const encodedpwd = encodeURI(`${password}`);
+          console.log(encodedpwd);
+
+          const sfloginurl = `${loginUrl}?un=${username}&pw=` + encodedpwd;
+          console.log(sfloginurl);
+          core.setOutput('sfloginurl', sfloginurl)
+      # You can use datas as ${{ steps.getdata.outputs.encodedpwd }} and ${{ steps.getdata.outputs.sfloginurl }}
 
 
       # install required package in the scratch org
@@ -119,13 +137,13 @@ jobs:
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-          notification-summary: ${sfloginurl}
+          notification-summary: ${{ steps.getdata.outputs.sfloginurl }}
           notification-color: 28a745
           timezone: America/Denver
 
       # delete the scratch org
-      - name: 'Delete the Scratch Org'
-        run: sfdx force:org:delete -u scratch --noprompt
+      #- name: 'Delete the Scratch Org'
+      #  run: sfdx force:org:delete -u scratch --noprompt
 
       # LOTS OF ERRORS WE CAN'T FIX WHEN TRYING TO INSTALL SFDX WITH NPM!
       # USING ABOVE METHOD INSTEAD FOR NOW
