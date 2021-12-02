@@ -75,6 +75,7 @@ jobs:
 
       # build a sf login url for the scratch org
       - name: 'Build Scratch Org Login Url'
+        id: scratchorg
         run: |
           display=$(cat sfuser.json | jq '.result')
           loginUrl=$(jq -r  '.loginUrl' <<< "${display}")
@@ -83,6 +84,11 @@ jobs:
           echo "loginUrl = ${loginUrl}"
           echo "username = ${username}"
           echo "password = ${password}"
+
+          echo "::set-output name=loginurl::${loginUrl}?un=${username}&pw="
+          echo "::set-output name=password::${password}"
+
+          # TODO: HAVE TO MAKE THE PARAMS ABOVE READABLE IN LOWER SCRIPTS
           # make file executable
           #chmod +x .github/workflows/encode-url.sh
           # run script
@@ -100,14 +106,14 @@ jobs:
             const core = require('@actions/core')
             const axios = require('axios')
 
-            console.log(`branch: ${password}`);
-            const encodedpwd = encodeURI(`${password}`);
+            console.log(`pwd: ${{ steps.scratchorg.outputs.password }}`);
+            const encodedpwd = encodeURI(`${{ steps.scratchorg.outputs.password }}`);
             console.log(encodedpwd);
 
-            const sfloginurl = `${loginUrl}?un=${username}&pw=` + encodedpwd;
-            console.log(sfloginurl);
-            core.setOutput('sfloginurl', sfloginurl);
+            core.setOutput('sfloginurl', ${{ steps.scratchorg.outputs.loginurl }} + encodedpwd);
       # You can use datas as ${{ steps.getdata.outputs.encodedpwd }} and ${{ steps.getdata.outputs.sfloginurl }}
+#            //const sfloginurl = `${loginUrl}?un=${username}&pw=` + encodedpwd;
+ #           console.log(sfloginurl);
 
 
       # install required package in the scratch org
