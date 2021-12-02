@@ -68,7 +68,7 @@ jobs:
       # create a scratch org
       - name: Create a Scratch Org
         run: |
-          sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER"
+          sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER" --wait 10
           sfdx force:user:password:generate -u scratch
           sfdx force:user:display -u scratch --json > sfuser.json
           echo "sfuser.json = $(cat sfuser.json)"
@@ -111,7 +111,9 @@ jobs:
             console.log("encodedpwd = " + encodedpwd);
             const sfloginurl = `${{ steps.scratchorg.outputs.loginurl }}` + encodedpwd;
             console.log("sfloginurl = " + sfloginurl);
-            const sfloginmsg = "<a href='" + sfloginurl + "'>Login to Scratch Org To Test Feature</a>";
+            // urls are supported in markdown only - no html
+            const sfloginmsg = "You can test the feature from this PR in this [Scratch Org](" + sfloginurl + ")";
+            //const sfloginmsg = "<a href='" + sfloginurl + "'>Login to Scratch Org To Test Feature</a>";
             core.setOutput('sfloginmsg', sfloginmsg);
 
       # install required package in the scratch org
