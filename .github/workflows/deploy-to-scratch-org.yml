@@ -54,7 +54,7 @@ jobs:
       # source scanner - ignore Test classes
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
       # ,!./**/*Test.cls
-      - name: Static Apex Class Analysis (excluding Test classes)
+      - name: Static Apex Class Analysis
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation  --format=json --outfile=scan.json --severity-threshold=2
           echo "scan.json = $(cat scan.json)"
@@ -102,8 +102,7 @@ jobs:
             const sfloginurl = `${{ steps.scratchorg.outputs.loginurl }}` + encodedpwd;
             console.log("sfloginurl = " + sfloginurl);
             // urls are supported in markdown only - no html
-            //const sfloginmsg = "You can test the feature from this PR in this [Scratch Org](" + sfloginurl + ")";
-            const sfloginmsg = "<a href='" + sfloginurl + "'>Scratch Org Login To Test Feature</a>";
+            const sfloginmsg = "You can test PR feature in this [Salesforce Scratch Org](" + sfloginurl + ")";
             core.setOutput('sfloginmsg', sfloginmsg);
 
       # install required package in the scratch org
