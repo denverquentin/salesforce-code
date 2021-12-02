@@ -94,19 +94,19 @@ jobs:
         uses: satackey/action-js-inline@v0.0.2
         id: getdata
         with:
-        # Edit the following line to install packages required to run your script.
-        required-packages: axios
-        script: |
-          const core = require('@actions/core')
-          const axios = require('axios')
+          # Edit the following line to install packages required to run your script.
+          required-packages: axios
+          script: |
+            const core = require('@actions/core')
+            const axios = require('axios')
 
-          console.log(`branch: ${password}`);
-          const encodedpwd = encodeURI(`${password}`);
-          console.log(encodedpwd);
+            console.log(`branch: ${password}`);
+            const encodedpwd = encodeURI(`${password}`);
+            console.log(encodedpwd);
 
-          const sfloginurl = `${loginUrl}?un=${username}&pw=` + encodedpwd;
-          console.log(sfloginurl);
-          core.setOutput('sfloginurl', sfloginurl)
+            const sfloginurl = `${loginUrl}?un=${username}&pw=` + encodedpwd;
+            console.log(sfloginurl);
+            core.setOutput('sfloginurl', sfloginurl);
       # You can use datas as ${{ steps.getdata.outputs.encodedpwd }} and ${{ steps.getdata.outputs.sfloginurl }}
 
 
