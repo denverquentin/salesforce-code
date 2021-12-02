@@ -1,6 +1,6 @@
 #!/bin/bash
 
-local string="${1}"
+local string="$1"
 local strlen=${#string}
 local encoded=""
 local pos c o
@@ -10,8 +10,8 @@ for (( pos=0 ; pos<strlen ; pos++ )); do
 case "$c" in
 	[-_.~a-zA-Z0-9] ) o="${c}" ;;
 	* ) printf -v o '%%%02x' "'$c"
-esac
+	esac
 	encoded+="${o}"
-done
+	done
 	echo "${encoded}"    # You can either set a return variable (FASTER)
 	REPLY="${encoded}"   #+or echo the result (EASIER)... or both... :p
