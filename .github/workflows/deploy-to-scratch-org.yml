@@ -120,7 +120,7 @@ jobs:
         run: sfdx force:source:deploy -u scratch -x manifest/package.xml
 
       # assign the permission set
-      - name: Assign Permission Set to Scratch Org User
+      #- name: Assign Permission Set to Scratch Org User
       #  run: sfdx force:user:permset:assign -n PermSet -u scratch
 
       # run all tests in the scratch org
