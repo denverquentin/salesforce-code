@@ -126,17 +126,11 @@ jobs:
       # run all tests in the scratch org
       - name: Run All Tests in Scratch Org
         run: sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat human
-# TODO: DOES THIS RETURN TEST ERRORS ABOVE? IF NOT, MAYBE SWITCH BACK TO JSON AND PARSE THEM OUT
-#        run: |
-#          sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat json > sftestresults.json
-#          echo "sftestresults.json = $(cat sftestresults.json)"
 
-
-      # check code coverage for all classes to make all are > 85%
-      - name: Check Apex Code Coverage > 85%
+      # verify code coverage is good
+      - name: Verify Apex Class Code Coverage > 85%
         run: |
-          sfdx force:data:soql:query -q 'select ApexTestClass.Name, TestMethodName, ApexClassOrTrigger.Name, NumLinesUncovered, NumLinesCovered from ApexCodeCoverageAggregate order by ApexClassOrTrigger.Name' -u scratch -t -r json > testcoverage.json
-          echo "testcoverage.json = $(cat testcoverage.json)"
+          sfdx force:apex:execute -f check-test-coverage.apex -u scratch
 
       # send notification to Teams channel using the ms-teams-notification action
       # https://github.com/marketplace/actions/microsoft-teams-notification
