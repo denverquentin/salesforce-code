@@ -130,7 +130,7 @@ jobs:
       # verify code coverage is good
       - name: Verify Apex Class Code Coverage > 85%
         run: |
-          sfdx force:apex:execute -f check-test-coverage.apex -u scratch
+          sfdx force:apex:execute -f scripts/check-test-coverage.apex -u scratch
 
       # send notification to Teams channel using the ms-teams-notification action
       # https://github.com/marketplace/actions/microsoft-teams-notification
