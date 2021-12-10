@@ -60,9 +60,13 @@ jobs:
           echo "scan.json = $(cat scan.json)"
 
       # authenticate to SF dev hub
+      # --username ${{ secrets.HUB_ORG_USER }}
       - name: Authenticate to Salesforce Dev Hub
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername
+        	if [ $? -ne 0 ]; then
+            return 1
+          fi
           sfdx force:org:list
 
       # create a scratch org
@@ -130,7 +134,8 @@ jobs:
       # verify code coverage is good
       - name: Verify Apex Class Code Coverage > 85%
         run: |
-          sfdx force:apex:execute -f scripts/check-test-coverage.apex -u scratch
+          sfdx force:apex:execute -f scripts/check-test-coverage.apex -u scratch  > testcoverage.json
+          echo "testcoverage.json = $(cat testcoverage.json)"
 
       # send notification to Teams channel using the ms-teams-notification action
       # https://github.com/marketplace/actions/microsoft-teams-notification
