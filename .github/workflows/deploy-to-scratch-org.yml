@@ -63,8 +63,10 @@ jobs:
       # --username ${{ secrets.HUB_ORG_USER }}
       - name: Authenticate to Salesforce Dev Hub
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > devhubauth.json
           if [ $? -ne 0 ]; then
+            echo "Error authenticating to the Salesforce Dev Hub"
+            echo "devhubauth.json = $(cat devhubauth.json)"
             return 1
           fi
           sfdx force:org:list
