@@ -68,13 +68,10 @@ jobs:
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
-          exit_status=sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > devhubauth.json
-          if [ $exit_status -eq 1 ]; then
-            echo "Authentication to Salesforce Dev Hub failed. Please check your credentials."
-            echo "devhubauth.json = $(cat devhubauth.json)"
-            exit 1
-          fi
-          sfdx force:org:list
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > devhubauth.json
+          && sfdx force:org:list
+          || echo "Authentication to Salesforce Dev Hub failed. Please check your credentials."
+          && echo "devhubauth.json = $(cat devhubauth.json)"
 
       # create a scratch org
       - name: Create a Scratch Org
