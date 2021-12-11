@@ -30,6 +30,7 @@ jobs:
     steps:
       # install sfdx & source scanner plugin
       - name: Install SFDX (Salesforce CLI)
+        id: install-sfdx
         run: |
           wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
           mkdir sfdx-cli
@@ -38,6 +39,7 @@ jobs:
           sfdx plugins:install @salesforce/sfdx-scanner
 
       - name: Output SFDX Version
+        id: output-sfdx
         run: |
           sfdx --version
           sfdx force
@@ -49,12 +51,14 @@ jobs:
 
       # lint javascript for lwc's
       - name: Lint Lightning Web Components
+        id: lint-lwc
         run: sfdx force:lightning:lint --exit .force-app/main/default/lwc
 
       # source scanner - ignore Test classes
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
       # ,!./**/*Test.cls
       - name: Static Apex Class Analysis
+        id: analyze-apex
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation  --format=json --outfile=scan.json --severity-threshold=2
           echo "scan.json = $(cat scan.json)"
@@ -62,15 +66,19 @@ jobs:
       # authenticate to SF dev hub
       # --username ${{ secrets.HUB_ORG_USER }}
       - name: Authenticate to Salesforce Dev Hub
+        id: authenticate-devhub
         run: |
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > devhubauth.json
           echo "devhubauth.json = $(cat devhubauth.json)"
           sfdx force:org:list
+
+      - name: Error Logging
+        id: error-logging
         if: failure()
         run: |
           echo "Authentication to Salesforce Dev Hub failed. Please check your credentials."
-          echo "devhubauth.json = $(cat devhubauth.json)"
           exit 1
+      #  echo "devhubauth.json = $(cat devhubauth.json)"
 
       # create a scratch org
       - name: Create a Scratch Org
