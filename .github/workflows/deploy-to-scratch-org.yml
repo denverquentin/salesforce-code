@@ -68,17 +68,9 @@ jobs:
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > devhubauth.json
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > devhubauth.json || echo "devhubauth.json = $(cat devhubauth.json)"
           echo "devhubauth.json = $(cat devhubauth.json)"
           sfdx force:org:list
-
-      - name: Error Logging
-        id: error-logging
-        if: failure()
-        run: |
-          echo "Authentication to Salesforce Dev Hub failed. Please check your credentials."
-          exit 1
-      #  echo "devhubauth.json = $(cat devhubauth.json)"
 
       # create a scratch org
       - name: Create a Scratch Org
@@ -158,6 +150,14 @@ jobs:
           notification-summary: ${{ steps.getdata.outputs.sfloginmsg }}
           notification-color: 28a745
           timezone: America/Denver
+
+      - name: Error Logging
+        id: error-logging
+        if: failure()
+        run: |
+          echo "Authentication to Salesforce Dev Hub failed. Please check your credentials."
+          exit 1
+      #  echo "devhubauth.json = $(cat devhubauth.json)"
 
       # delete the scratch org
       #- name: Delete the Scratch Org
