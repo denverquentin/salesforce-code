@@ -153,12 +153,17 @@ jobs:
           notification-color: 28a745
           timezone: America/Denver
 
-      # TODO: turn this into javascript!
+      # https://github.com/marketplace/actions/execute-javascript-inline
+      # To use latest action, specify "release-master" instead of "v0.0.2"
       - name: Determine Error
         id: error
         if: failure()
-        run: |
-          echo "::set-output name=message:: ${{ steps.authenticate-devhub.outputs.error }}"
+        uses: satackey/action-js-inline@v0.0.2
+        with:
+          script: |
+            const core = require('@actions/core');
+            console.log(`error: ${{ steps.authenticate-devhub.outputs.error }}`);
+            core.setOutput('message', `${{ steps.authenticate-devhub.outputs.error }}`);
 
       - name: Error Notification to Teams Channel
         id: error-notification
@@ -167,7 +172,7 @@ jobs:
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-          notification-summary: ${{ steps.error.ouputs.message }}
+          notification-summary: ${{ steps.error.outputs.message }}
           notification-color: dc3545
           timezone: America/Denver
 
