@@ -153,20 +153,23 @@ jobs:
           notification-color: 28a745
           timezone: America/Denver
 
+      - name: Determine Error
+        id: error
+        if: failure()
+        output: message
+        run: |
+          echo "::set-output name=message:: ${{ steps.authenticate-devhub.outputs.error }}"
+
       - name: Error Notification to Teams Channel
         id: error-notification
         if: failure()
-        output: error
-        run: |
-          echo "::set-output name=error:: ${{ steps.authenticate-devhub.outputs.error }}"
         uses: jdcargile/ms-teams-notification@v1.3
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-          notification-summary: ${{ steps.error-notification.ouputs.error }}
+          notification-summary: ${{ steps.error.ouputs.message }}
           notification-color: dc3545
           timezone: America/Denver
-
 
       # delete the scratch org
       #- name: Delete the Scratch Org
