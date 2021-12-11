@@ -68,7 +68,7 @@ jobs:
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
-          OUTPUT
+          OUTPUT="all good"
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > OUTPUT \
           && sfdx force:org:list \
           || echo "Authentication to Salesforce Dev Hub failed. Please check your credentials." \
