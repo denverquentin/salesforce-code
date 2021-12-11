@@ -153,10 +153,10 @@ jobs:
           notification-color: 28a745
           timezone: America/Denver
 
+      # TODO: turn this into javascript!
       - name: Determine Error
         id: error
         if: failure()
-        output: message
         run: |
           echo "::set-output name=message:: ${{ steps.authenticate-devhub.outputs.error }}"
 
