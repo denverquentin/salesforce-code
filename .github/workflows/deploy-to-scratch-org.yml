@@ -70,7 +70,7 @@ jobs:
           OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
           && sfdx force:org:list \
           || echo "Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-          && echo "::set-env name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+          && echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
           && echo "devhubauth.json = $OUTPUT" \
           && exit 1
 
@@ -154,12 +154,16 @@ jobs:
           timezone: America/Denver
 
       - name: Error Notification to Teams Channel
+        id: error-notification
         if: failure()
+        output: error
+        run: |
+          echo "::set-output name=error:: ${{ steps.authenticate-devhub.outputs.error }}"
         uses: jdcargile/ms-teams-notification@v1.3
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-          notification-summary: ${{ env.error }}
+          notification-summary: ${{ steps.error-notification.ouputs.error }}
           notification-color: dc3545
           timezone: America/Denver
 
