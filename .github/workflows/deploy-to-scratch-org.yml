@@ -24,7 +24,6 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     # helpful doc: https://developer.salesforce.com/blogs/2020/01/using-salesforce-dx-with-github-actions
     steps:
@@ -71,9 +70,9 @@ jobs:
           OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
           && sfdx force:org:list \
           || echo "Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-          && echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-          && echo "devhubauth.json = $OUTPUT"
-#          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername  --json > devhubauth.json && sfdx force:org:list || echo "Authentication to Salesforce Dev Hub failed. Please check your credentials." && echo "devhubauth.json = $(cat devhubauth.json)"
+          && echo "::set-env name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+          && echo "devhubauth.json = $OUTPUT" \
+          && exit 1
 
       # create a scratch org
       - name: Create a Scratch Org
@@ -154,12 +153,16 @@ jobs:
           notification-color: 28a745
           timezone: America/Denver
 
-#      - name: Error Logging
-#        id: error-logging
-#        if: failure()
-#        run: |
-#          exit 1
-      #  echo "devhubauth.json = $(cat devhubauth.json)"
+      - name: Error Notification to Teams Channel
+        if: failure()
+        uses: jdcargile/ms-teams-notification@v1.3
+        with:
+          github-token: ${{ github.token }} # this will use the runner's token.
+          ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
+          notification-summary: ${{ env.error }}
+          notification-color: dc3545
+          timezone: America/Denver
+
 
       # delete the scratch org
       #- name: Delete the Scratch Org
