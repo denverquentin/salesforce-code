@@ -52,11 +52,20 @@ jobs:
       - name: Lint Lightning Web Components
         id: lint-lwc
         run: |
-          OUTPUT=$(sfdx force:lightning:lint --exit .force-app/main/default/lwc --json) \
-          || echo "::set-output name=error::LWC Lint error. Please fix to continue." \
-          && echo ${{ steps.lint-lwc.outputs.message }} \
-          && echo "lwc-lint.json = $OUTPUT" \
-          && exit 1
+          sfdx force:lightning:lint --exit .force-app/main/default/lwc
+          echo $?
+          if [ $? -ne 0 ]; then
+            echo "::set-output name=error::LWC Lint error. Please fix to continue." \
+            echo ${{ steps.lint-lwc.outputs.error }} \
+            return 1
+          fi
+
+#          OUTPUT=$(sfdx force:lightning:lint --exit .force-app/main/default/lwc --json); echo $?
+#          && echo "No LWC Lint errors." \
+#          || echo "::set-output name=error::LWC Lint error. Please fix to continue." \
+#          && echo ${{ steps.lint-lwc.outputs.error }} \
+#          && echo "lwc-lint.json = $OUTPUT"
+#          && exit 1
 
       # source scanner - ignore Test classes
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
@@ -64,8 +73,12 @@ jobs:
       - name: Static Apex Class Analysis
         id: analyze-apex
         run: |
-          sfdx scanner:run --target=force-app/main/default --category=!Documentation  --format=json --outfile=scan.json --severity-threshold=2
-          echo "scan.json = $(cat scan.json)"
+          OUTPUT=$(sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2) \
+          && echo "scan.json = $(cat scan.json)" \
+          || echo "::set-output name=error::Static Apex Class Analysis found one or more rule violation. Please fix to continue." \
+          && echo ${{ steps.analyze-apex.outputs.error }} \
+          && echo "analyze-apex.json = $OUTPUT" \
+          && exit 1
 
       # authenticate to SF dev hub
       # --username ${{ secrets.HUB_ORG_USER }}
@@ -75,17 +88,22 @@ jobs:
           OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
           && sfdx force:org:list \
           || echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-          && echo ${{ steps.authenticate-devhub.outputs.message }} \
+          && echo ${{ steps.authenticate-devhub.outputs.error }} \
           && echo "auth.json = $OUTPUT" \
           && exit 1
 
       # create a scratch org
       - name: Create a Scratch Org
+        id: create-scratchorg
         run: |
-          sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER" --wait 10
-          sfdx force:user:password:generate -u scratch
-          sfdx force:user:display -u scratch --json > sfuser.json
-          echo "sfuser.json = $(cat sfuser.json)"
+          OUTPUT=$(sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER" --wait 10 --json) \
+          && sfdx force:user:password:generate -u scratch \
+          && sfdx force:user:display -u scratch --json > sfuser.json \
+          && echo "sfuser.json = $(cat sfuser.json)" \
+          || echo "::set-output name=error::Failed to create a scratch org. Please check the log for errors or try again." \
+          && echo ${{ steps.create-scratchorg.outputs.error }} \
+          && echo "create-scratchorg.json = $OUTPUT" \
+          && exit 1
 
       # parse out info we'll need to login to the sf scratch org
       - name: Parse Scratch Org Login Info
