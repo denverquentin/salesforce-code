@@ -73,24 +73,35 @@ jobs:
       - name: Static Apex Class Analysis
         id: analyze-apex
         run: |
-          OUTPUT=$(sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2) \
-          && echo "scan.json = $(cat scan.json)" \
-          || echo "::set-output name=error::Static Apex Class Analysis found one or more rule violation. Please fix to continue." \
-          && echo ${{ steps.analyze-apex.outputs.error }} \
-          && echo "analyze-apex.json = $OUTPUT" \
-          && exit 1
+          sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2
+
+#          OUTPUT=$(sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2) \
+#          && echo "scan.json = $(cat scan.json)" \
+#          || echo "::set-output name=error::Static Apex Class Analysis found one or more rule violation. Please fix to continue." \
+#          && echo ${{ steps.analyze-apex.outputs.error }} \
+#          && echo "analyze-apex.json = $OUTPUT" \
+#          && exit 1
 
       # authenticate to SF dev hub
       # --username ${{ secrets.HUB_ORG_USER }}
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
-          OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
-          && sfdx force:org:list \
-          || echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-          && echo ${{ steps.authenticate-devhub.outputs.error }} \
-          && echo "auth.json = $OUTPUT" \
-          && exit 1
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername
+          echo $?
+          if [ $? -ne 0 ]; then
+            echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+            echo ${{ steps.lint-lwc.outputs.error }} \
+            return 1
+          fi
+          sfdx force:org:list
+
+#          OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
+#          && sfdx force:org:list \
+#          || echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+#          && echo ${{ steps.authenticate-devhub.outputs.error }} \
+#          && echo "auth.json = $OUTPUT" \
+#          && exit 1
 
       # create a scratch org
       - name: Create a Scratch Org
