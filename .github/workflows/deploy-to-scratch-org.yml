@@ -87,14 +87,16 @@ jobs:
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername
-          echo "me loggy $?"
-          if [ $? -ne 0 ]; then
-            echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-            echo ${{ steps.authenticate-devhub.outputs.error }} \
-            exit 1
-          fi
-          sfdx force:org:list
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json
+          echo "auth.json = $(cat auth.json)"
+
+#          echo "me loggy $?"
+#          if [ $? -ne 0 ]; then
+#            echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+#            echo ${{ steps.authenticate-devhub.outputs.error }} \
+#            exit 1
+#          fi
+#          sfdx force:org:list
 
 #          OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
 #          && sfdx force:org:list \
