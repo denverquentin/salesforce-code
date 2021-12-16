@@ -51,11 +51,16 @@ jobs:
       # lint javascript for lwc's
       - name: Lint Lightning Web Components
         id: lint-lwc
-        run: sfdx force:lightning:lint --exit .force-app/main/default/lwc
+        run: |
+          OUTPUT=$(sfdx force:lightning:lint --exit .force-app/main/default/lwc --json) \
+          || echo "::set-output name=error::LWC Lint error. Please fix to continue." \
+          && echo ${{ steps.lint-lwc.outputs.message }} \
+          && echo "lwc-lint.json = $OUTPUT" \
+          && exit 1
 
       # source scanner - ignore Test classes
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
-      # ,!./**/*Test.cls
+      # TODO: this needs some work! want to define a custom rule set and also throw error + log if there are any rule violations
       - name: Static Apex Class Analysis
         id: analyze-apex
         run: |
@@ -69,9 +74,9 @@ jobs:
         run: |
           OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
           && sfdx force:org:list \
-          || echo "Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-          && echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-          && echo "devhubauth.json = $OUTPUT" \
+          || echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+          && echo ${{ steps.authenticate-devhub.outputs.message }} \
+          && echo "auth.json = $OUTPUT" \
           && exit 1
 
       # create a scratch org
@@ -153,6 +158,7 @@ jobs:
           notification-color: 28a745
           timezone: America/Denver
 
+      # TODO: can probably move the teams notification into this step!!!
       # https://github.com/marketplace/actions/execute-javascript-inline
       # To use latest action, specify "release-master" instead of "v0.0.2"
       - name: Determine Error
