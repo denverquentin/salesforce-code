@@ -57,7 +57,7 @@ jobs:
         run: |
           sfdx force:lightning:lint --exit .force-app/main/default/lwc
 
-      # source scanner - ignore Test classes
+      # source scanner
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
       # TODO: this needs some work! want to define a custom rule set and also throw error + log if there are any rule violations
       - name: Static Apex Class Analysis
@@ -90,7 +90,6 @@ jobs:
           sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER" --wait 10 --json > scratch.json || true
           echo "scratch.json = $(jq . scratch.json)"
           status=$(jq -r '.status' scratch.json)
-          echo "status = $status"
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' scratch.json)
             echo "::set-output name=error::${msg}"
