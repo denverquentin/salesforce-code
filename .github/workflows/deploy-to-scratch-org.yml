@@ -8,12 +8,12 @@ on:
   push:
     branches: [ master, dev, feature/** ]
     paths:
-      - 'force-app/**'
+#      - 'force-app/**'
   pull_request:
     types: [opened, synchronized, reopened]
     branches: [ dev ]
     paths:
-      - 'force-app/**'
+#      - 'force-app/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -73,7 +73,7 @@ jobs:
           auth=$(cat auth.json | jq '.result')
           status=$(jq -r  '.status' <<< "${auth}")
           echo "status = ${status}"
-          if [ status -ne 0 ]; then
+          if [ ${status} -ne 0 ]; then
             msg=$(jq -r  '.message' <<< "${auth}");
             echo "::set-output name=error::${msg}"
             echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
