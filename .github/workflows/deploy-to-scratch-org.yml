@@ -61,6 +61,7 @@ jobs:
         id: analyze-apex
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2
+          echo "analyze-apex.json = $(cat analyze-apex.json)"
 
       # authenticate to SF dev hub
       # --username ${{ secrets.HUB_ORG_USER }}
@@ -70,12 +71,13 @@ jobs:
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json || true
           echo "auth.json = $(cat auth.json)"
           json=$(cat auth.json | jq '.result')
-          if [ $(jq -r '.status' <<< "${json}") -ne 0 ]; then
+          if [ (jq -r '.status' <<< "${json}") -ne 0 ]; then
             echo "::set-output name=error::$(jq -r '.message' <<< "${json}")"
             echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
             exit 1
+          else
+            sfdx force:org:list
           fi
-          sfdx force:org:list
 
       # create a scratch org
       - name: Create a Scratch Org
