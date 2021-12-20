@@ -76,7 +76,9 @@ jobs:
           echo "status = $status"
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' auth.json)
-            echo ::set-output name=error::${msg}
+            echo "::set-output name=fruit::strawberry"
+            echo "error = ${{ steps.authenticate-devhub.outputs.fruit }}"
+            echo "::set-output name=error::$msg"
             echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
             exit 1
           else
