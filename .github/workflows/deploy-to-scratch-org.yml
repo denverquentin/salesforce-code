@@ -51,6 +51,7 @@ jobs:
         uses: actions/checkout@v2
 
       # lint javascript for lwc's
+      # TODO: this is deprecated - use the sfdx scanner:run intead - it has a lint feature
       - name: Lint Lightning Web Components
         id: lint-lwc
         run: |
@@ -73,13 +74,10 @@ jobs:
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json || true
           echo "auth.json = $(jq . auth.json)"
           status=$(jq -r '.status' auth.json)
-          echo "status = $status"
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' auth.json)
-            echo "::set-output name=fruit::strawberry"
-            echo "error = ${{ steps.authenticate-devhub.outputs.fruit }}"
+            echo "error = $msg"
             echo "::set-output name=error::$msg"
-            echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
             exit 1
           else
             sfdx force:org:list
@@ -95,7 +93,8 @@ jobs:
           echo "status = $status"
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' scratch.json)
-            echo "::set-output name=error::echo ${msg}"
+            echo "::set-output name=error::${msg}"
+            echo "error = $msg"
             echo "error = ${{ steps.create-scratchorg.outputs.error }}"
             exit 1
           else
