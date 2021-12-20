@@ -74,7 +74,6 @@ jobs:
         id: analyze-apex
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2
-
 #          OUTPUT=$(sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2) \
 #          && echo "scan.json = $(cat scan.json)" \
 #          || echo "::set-output name=error::Static Apex Class Analysis found one or more rule violation. Please fix to continue." \
@@ -88,13 +87,13 @@ jobs:
         id: authenticate-devhub
         run: |
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json || true
-          echo "me loggy $?"
+#          echo "me loggy $?"
           echo "auth.json = $(cat auth.json)"
           json=$(cat auth.json | jq '.result')
-          if [ $(jq -r  '.status' <<< "${json}") -ne 0 ]; then
-            echo "::set-output name=error::$(jq -r  '.messag' <<< "${json}")" \
+          if [ $(jq -r '.status' <<< "${json}") -ne 0 ]; then
+            echo "::set-output name=error::$(jq -r '.message' <<< "${json}")"
 #            echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-            echo ${{ steps.authenticate-devhub.outputs.error }} \
+            echo ${{ steps.authenticate-devhub.outputs.error }}
             exit 1
           fi
           sfdx force:org:list
