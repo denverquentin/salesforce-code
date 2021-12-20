@@ -53,19 +53,6 @@ jobs:
         id: lint-lwc
         run: |
           sfdx force:lightning:lint --exit .force-app/main/default/lwc
-          echo $?
-          if [ $? -ne 0 ]; then
-            echo "::set-output name=error::LWC Lint error. Please fix to continue." \
-            echo ${{ steps.lint-lwc.outputs.error }} \
-            return 1
-          fi
-
-#          OUTPUT=$(sfdx force:lightning:lint --exit .force-app/main/default/lwc --json); echo $?
-#          && echo "No LWC Lint errors." \
-#          || echo "::set-output name=error::LWC Lint error. Please fix to continue." \
-#          && echo ${{ steps.lint-lwc.outputs.error }} \
-#          && echo "lwc-lint.json = $OUTPUT"
-#          && exit 1
 
       # source scanner - ignore Test classes
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
@@ -74,12 +61,10 @@ jobs:
         id: analyze-apex
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2
-#          OUTPUT=$(sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2) \
-#          && echo "scan.json = $(cat scan.json)" \
-#          || echo "::set-output name=error::Static Apex Class Analysis found one or more rule violation. Please fix to continue." \
-#          && echo ${{ steps.analyze-apex.outputs.error }} \
-#          && echo "analyze-apex.json = $OUTPUT" \
-#          && exit 1
+          echo "analyze-apex.json = $(cat analyze-apex.json)"
+#  echo "::set-output name=error::Static Apex Class Analysis found one or more rule violation. Please fix to continue."
+#  echo ${{ steps.analyze-apex.outputs.error }}
+#  exit 1
 
       # authenticate to SF dev hub
       # --username ${{ secrets.HUB_ORG_USER }}
@@ -87,29 +72,20 @@ jobs:
         id: authenticate-devhub
         run: |
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json || true
-#          echo "me loggy $?"
           echo "auth.json = $(cat auth.json)"
           json=$(cat auth.json | jq '.result')
           if [ $(jq -r '.status' <<< "${json}") -ne 0 ]; then
             echo "::set-output name=error::$(jq -r '.message' <<< "${json}")"
-#            echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-            echo ${{ steps.authenticate-devhub.outputs.error }}
+#   echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+            echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
             exit 1
           fi
           sfdx force:org:list
-#          if [ $? -ne 0 ]; then
-#            echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-#            echo ${{ steps.authenticate-devhub.outputs.error }} \
-#            exit 1
-#          fi
-#          sfdx force:org:list
-
-#          OUTPUT=$(sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json) \
-#          && sfdx force:org:list \
-#          || echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
-#          && echo ${{ steps.authenticate-devhub.outputs.error }} \
-#          && echo "auth.json = $OUTPUT" \
-#          && exit 1
+#     if [ $? -ne 0 ]; then
+#       echo "::set-output name=error::Authentication to Salesforce Dev Hub failed. Please check your credentials." \
+#       echo ${{ steps.authenticate-devhub.outputs.error }} \
+#       exit 1
+#      fi
 
       # create a scratch org
       - name: Create a Scratch Org
