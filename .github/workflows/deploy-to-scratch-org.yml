@@ -69,13 +69,13 @@ jobs:
         id: authenticate-devhub
         run: |
           sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username www.someone@ust.com.hello --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json || true
+          echo "auth.json = $(cat auth.json)"
           display=$(cat auth.json | jq '.result')
-          echo "auth.json = ${display}"
           status=$(jq -r  '.status' <<< "${display}")
-          echo "status = ${status}"
-          if [ ${status} -ne 0 ]; then
+          echo "status = $status"
+          if [ $status -ne 0 ]; then
             msg=$(jq -r  '.message' <<< "${display}");
-            echo "::set-output name=error::${msg}"
+            echo "::set-output name=error::$msg"
             echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
             exit 1
           else
