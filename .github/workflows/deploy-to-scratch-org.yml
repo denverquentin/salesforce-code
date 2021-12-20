@@ -9,11 +9,13 @@ on:
     branches: [ master, dev, feature/** ]
     paths:
 #      - 'force-app/**'
+# commented out above until we get the cicd process finished - maybe leave this off forever
   pull_request:
     types: [opened, synchronized, reopened]
     branches: [ dev ]
     paths:
 #      - 'force-app/**'
+# commented out above until we get the cicd process finished - maybe leave this off forever
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -76,7 +78,7 @@ jobs:
             msg=$(jq -r '.message' auth.json)
             echo "msg = $msg"
             echo "msg2 = ${msg}"
-            echo "::set-output name=error::${msg}"
+            echo "::set-output name=error::$msg"
             echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
             exit 1
           else
