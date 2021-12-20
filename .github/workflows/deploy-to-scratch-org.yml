@@ -62,9 +62,6 @@ jobs:
         run: |
           sfdx scanner:run --target=force-app/main/default --category=!Documentation --format=json --outfile=analyze-apex.json --severity-threshold=2
           echo "analyze-apex.json = $(cat analyze-apex.json)"
-#  echo "::set-output name=error::Static Apex Class Analysis found one or more rule violation. Please fix to continue."
-#  echo ${{ steps.analyze-apex.outputs.error }}
-#  exit 1
 
       # authenticate to SF dev hub
       # --username ${{ secrets.HUB_ORG_USER }}
