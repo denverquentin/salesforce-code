@@ -76,9 +76,7 @@ jobs:
           echo "status = $status"
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' auth.json)
-            echo "msg = $msg"
-            echo "msg2 = ${msg}"
-            echo "::set-output name=error::echo ${msg}"
+            echo ::set-output name=error::${msg}
             echo "error = ${{ steps.authenticate-devhub.outputs.error }}"
             exit 1
           else
@@ -89,14 +87,20 @@ jobs:
       - name: Create a Scratch Org
         id: create-scratchorg
         run: |
-          OUTPUT=$(sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER" --wait 10 --json) \
-          && sfdx force:user:password:generate -u scratch \
-          && sfdx force:user:display -u scratch --json > sfuser.json \
-          && echo "sfuser.json = $(cat sfuser.json)" \
-          || echo "::set-output name=error::Failed to create a scratch org. Please check the log for errors or try again." \
-          && echo ${{ steps.create-scratchorg.outputs.error }} \
-          && echo "create-scratchorg.json = $OUTPUT" \
-          && exit 1
+          sfdx force:org:create -f config/project-scratch-def.json --durationdays 1 --setalias scratch --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER" --wait 10 --json > scratch.json || true
+          echo "scratch.json = $(jq . scratch.json)"
+          status=$(jq -r '.status' scratch.json)
+          echo "status = $status"
+          if [ $status -ne 0 ]; then
+            msg=$(jq -r '.message' scratch.json)
+            echo "::set-output name=error::echo ${msg}"
+            echo "error = ${{ steps.create-scratchorg.outputs.error }}"
+            exit 1
+          else
+            sfdx force:user:password:generate -u scratch
+            sfdx force:user:display -u scratch --json > sfuser.json
+            echo "sfuser.json = $(jq . sfuser.json)"
+          fi
 
       # parse out info we'll need to login to the sf scratch org
       - name: Parse Scratch Org Login Info
