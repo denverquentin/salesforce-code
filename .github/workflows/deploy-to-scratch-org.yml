@@ -106,11 +106,10 @@ jobs:
       - name: Parse Scratch Org Login Info
         id: scratchorg
         run: |
-          display=$(cat sfuser.json | jq '.result')
-          instanceUrl=$(jq -r  '.instanceUrl' <<< "${display}")
-          username=$(jq -r  '.username' <<< "${display}")
-          password=$(jq -r  '.password' <<< "${display}")
-          accessToken="$(jq -r .accessToken <<< "${display}")"
+          instanceUrl=$(jq -r '.instanceUrl' sfuser.json)
+          username=$(jq -r '.username' sfuser.json)
+          password=$(jq -r '.password' sfuser.json)
+          accessToken=$(jq -r '.accessToken' sfuser.json)
           echo "instanceUrl = ${instanceUrl}"
           echo "username = ${username}"
           echo "password = ${password}"
@@ -146,7 +145,18 @@ jobs:
 
       # deploy code to the scratch org
       - name: Deploy Code to Scratch Org
-        run: sfdx force:source:deploy -u scratch -x manifest/package.xml
+        id: deploy-source
+        run: |
+          sfdx force:source:deploy -u scratch -x manifest/package.xml --wait 10 --json > deploy.json || true
+          echo "deploy.json = $(jq . deploy.json)"
+          status=$(jq -r '.status' deploy.json)
+          if [ $status -ne 0 ]; then
+            msg=$(jq -r '.message' deploy.json)
+            echo "::set-output name=error::${msg}"
+            echo "error = $msg"
+            echo "error = ${{ steps.deploy-source.outputs.error }}"
+            exit 1
+          fi
 
       # assign the permission set
       #- name: Assign Permission Set to Scratch Org User
@@ -154,10 +164,23 @@ jobs:
 
       # run all tests in the scratch org
       - name: Run All Tests in Scratch Org
-        run: sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat human
+        id: run-tests
+        run: |
+          sfdx force:apex:test:run -u scratch --testlevel RunLocalTests --codecoverage --resultformat json > tests.json || true
+          echo "tests.json = $(jq . tests.json)"
+          status=$(jq -r '.status' tests.json)
+          if [ $status -ne 0 ]; then
+            msg=$(jq -r '.message' tests.json)
+            echo "::set-output name=error::${msg}"
+            echo "error = $msg"
+            echo "error = ${{ steps.run-tests.outputs.error }}"
+            exit 1
+          fi
+
 
       # verify code coverage is good
       - name: Verify Apex Class Code Coverage > 85%
+        id: verify-test-coverage
         run: |
           sfdx force:apex:execute -f scripts/check-test-coverage.apex -u scratch  > testcoverage.json
           echo "testcoverage.json = $(cat testcoverage.json)"
