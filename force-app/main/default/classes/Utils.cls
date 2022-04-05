@@ -86,6 +86,7 @@ public inherited sharing class Utils {
 	public static Boolean isValidId(String id) {
 		try {
 			Id x = (Id) id;
+			System.assert(x != null);
 		} catch (Exception e) {
 			return false;
 		}
