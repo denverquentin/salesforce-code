@@ -17,49 +17,43 @@ public inherited sharing class Access {
 								 AccessType.UPDATABLE
 								 AccessType.UPSERTABLE
 	 */
-	public static void checkPermissions(AccessType aType, List<SObject> records, List<Schema.SObjectField> fieldsToCheck) {
+	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, List<Schema.SObjectField> fieldsToCheck) {
 		//Datetime startTime = Datetime.now();
 		Utils.log('checkPermissions.aType = ' + aType);
-		//Utils.log('records = ' + records);
 
-		SObjectAccessDecision decision = Security.stripInaccessible(aType, records); // also checks that object is accessible
+		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
+			//Utils.log('rec = ' + rec);
+			if (rec.getSObjectType() != recType) {
+				throw new AccessException('recType ' + recType + ' does not match rec.SObjectType ' + rec.getSObjectType());
+			}
+		}
+
+		Boolean enforceRootObjectCRUD = true;
+		SObjectAccessDecision decision = Security.stripInaccessible(aType, records, enforceRootObjectCRUD);
 		//Utils.log('decision = ' + decision);
 
 		// line below can throw exception if the user doesn't have the permission on the object
-		Map<String,Set<String>> res = decision.getRemovedFields();
-		//Utils.log('res = ' + res);
+//		Map<String,Set<String>> res = decision.getRemovedFields();
+		Set<String> removedFields = decision.getRemovedFields().get(recType.getDescribe().getName());
+		//Utils.log('removedFields = ' + removedFields);
 
 		// for AccessType.READABLE, we could return an error if there are ANY removed fields
 		// but it's not safe if we're checking any of the other AccessType's because a read-only field
 		// like a formula or auto-number Name could be removed if the field is queried but is not removed
 		// before calling this method. a SF DML call will ignore these read-only fields and not throw an exception
 
-		Utils.log('fieldsToCheck = ' + fieldsToCheck);
-		// only need to continue if fieldsToCheck has values
-		if (fieldsToCheck != null && fieldsToCheck.size() > 0) {
-			Map<String,Schema.SObjectType> objs = Schema.getGlobalDescribe();
-			Map<Schema.SObjectType,Map<String,SObjectField>> fieldsForObj = new Map<Schema.SObjectType,Map<String,SObjectField>>();
-
-			Set<Schema.SObjectField> allFieldsRemoved = new Set<Schema.SObjectField>();
-
-			for (String obj : res.keySet()) {
-				//Utils.log('obj = ' + obj);
-				Schema.SObjectType objName = objs.get(obj.toLowerCase());
-				if (!fieldsForObj.containsKey(objName)) { // add it
-					fieldsForObj.put(objName, objName.getDescribe().fields.getMap());
-				}
-				Map<String,SObjectField> fields = fieldsForObj.get(objName);
-
-				for (String f : res.get(obj)) {
-					allFieldsRemoved.add(fields.get(f.toLowerCase()));
-				}
+//		Utils.log('fieldsToCheck = ' + fieldsToCheck);
+		// only need to continue if fieldsToCheck and removedFields have values
+		if (fieldsToCheck != null && fieldsToCheck.size() > 0 && removedFields != null && removedFields.size() > 0) {
+			Set<Schema.SObjectField> fieldsRemoved = new Set<Schema.SObjectField>();
+			Map<String,SObjectField> fieldsForObj = recType.getDescribe().fields.getMap();
+			for (String removedField : removedFields) {
+				fieldsRemoved.add(fieldsForObj.get(removedField.toLowerCase()));
 			}
-
-			Utils.log('all fields removed = ' + allFieldsRemoved);
 
 			for (Schema.SObjectField f : fieldsToCheck) {
 				//Utils.log('f = ' + f);
-				if (allFieldsRemoved.contains(f)) {
+				if (fieldsRemoved.contains(f)) {
 					throw new AccessException('You do not have permission to ' + getEnglishForAccessType(aType) + ' the ' + f + ' field.' + FIX_MSG);
 				}
 			}
@@ -68,23 +62,30 @@ public inherited sharing class Access {
 	}
 
 
-	/* identical to method above except that the fieldsToCheck is a List<String> instead of List<Schema.SObjectField> which makes the code below easier
-	   we'll probably call this a lot because SObject has a nice Map<String, Object> fieldsToValue = rec.getPopulatedFieldsAsMap(); method that returns
-	   fields as a String
-	   WARNING: THIS SHOULDN'T BE CALLED WITH MULTIPLE SObject types at once! I don't think the fieldsToCheck include the object reference like Schema.SObjectField does
-	   that could lead to the scenario where a field named Custom__c is removed from on one SObject type but not another causes a false positive
+	/* identical to method above except that the fieldsToCheck is a List<String> instead of List<Schema.SObjectField>
+	   which makes the code below easier we'll probably call this a lot because SObject has a nice
+	   Map<String,Object> fieldsToValue = rec.getPopulatedFieldsAsMap(); method that returns fields as a String
 	*/
-	public static void checkPermissions(AccessType aType, List<SObject> records, Set<String> fieldsToCheck) {
+	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, Set<String> fieldsToCheck) {
 		//Datetime startTime = Datetime.now();
 		Utils.log('checkPermissions.aType = ' + aType);
-		//Utils.log('records = ' + records);
 
-		SObjectAccessDecision decision = Security.stripInaccessible(aType, records); // also checks that object is accessible
+		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
+			//Utils.log('rec = ' + rec);
+			if (rec.getSObjectType() != recType) {
+				throw new AccessException('recType ' + recType + ' does not match rec.SObjectType ' + rec.getSObjectType());
+			}
+		}
+
+		Boolean enforceRootObjectCRUD = true;
+		SObjectAccessDecision decision = Security.stripInaccessible(aType, records, enforceRootObjectCRUD);
 		//Utils.log('decision = ' + decision);
 
 		// line below can throw exception if the user doesn't have the permission on the object
-		Map<String,Set<String>> res = decision.getRemovedFields();
+		//Map<String,Set<String>> res = decision.getRemovedFields();
 		//Utils.log('res = ' + res);
+		Set<String> removedFields = decision.getRemovedFields().get(recType.getDescribe().getName());
+		//Utils.log('removedFields = ' + removedFields);
 
 		// for AccessType.READABLE, we could return an error if there are ANY removed fields
 		// but it's not safe if we're checking any of the other AccessType's because a read-only field
@@ -92,21 +93,11 @@ public inherited sharing class Access {
 		// before calling this method. a SF DML call will ignore these read-only fields and not throw an exception
 
 		Utils.log('fieldsToCheck = ' + fieldsToCheck);
-		// only need to continue if fieldsToCheck has values
-		if (fieldsToCheck != null && fieldsToCheck.size() > 0) {
-			Set<String> allFieldsRemoved = new Set<String>();
-
-			for (Set<String> allFields : res.values()) {
-				// todo: will this work multiple objects? does the string contain the object name and field name?
-				// haven't tested it yet - could work but added warning to not use with multiple SObject types until we test
-				allFieldsRemoved.addAll(allFields);
-			}
-	
-			Utils.log('all fields removed = ' + allFieldsRemoved);
-
+		// only need to continue if fieldsToCheck and removedFields have values
+		if (fieldsToCheck != null && fieldsToCheck.size() > 0 && removedFields != null && removedFields.size() > 0) {
 			for (String f : fieldsToCheck) {
 				//Utils.log('f = ' + f);
-				if (allFieldsRemoved.contains(f)) {
+				if (removedFields.contains(f)) {
 					throw new AccessException('You do not have permission to ' + getEnglishForAccessType(aType) + ' the ' + f + ' field.' + FIX_MSG);
 				}
 			}
@@ -128,6 +119,7 @@ public inherited sharing class Access {
 		}
 		return '';
 	}
+
 
 	// the methods below may also be useful for simple permission checks but the above method handles both object and field permissions in one call
 	public static Boolean isAccessible(Schema.SObjectType obj) {

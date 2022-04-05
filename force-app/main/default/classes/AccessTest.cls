@@ -48,13 +48,13 @@ private class AccessTest {
 
 			// make sure it handles nulls ok
 			List<Schema.SObjectField> notSet;
-			Access.checkPermissions(AccessType.READABLE, new List<SObject> {a}, notSet);
+			Access.checkPermissions(Account.SObjectType, new List<SObject> {a}, AccessType.READABLE, notSet);
 
-			Access.checkPermissions(AccessType.READABLE, new List<SObject> {a}, fieldsToCheck);
+			Access.checkPermissions(Account.SObjectType, new List<SObject> {a}, AccessType.READABLE, fieldsToCheck);
 
-			Access.checkPermissions(AccessType.CREATABLE, new List<SObject> {a}, fieldsToCheck);
+			Access.checkPermissions(Account.SObjectType, new List<SObject> {a}, AccessType.CREATABLE, fieldsToCheck);
 
-			Access.checkPermissions(AccessType.UPDATABLE, new List<Account> {a}, fieldsToCheck);
+			Access.checkPermissions(Account.SObjectType, new List<Account> {a}, AccessType.UPDATABLE, fieldsToCheck);
 
 		} catch (Exception e) {
 			Utils.logError(e);
@@ -82,11 +82,11 @@ private class AccessTest {
 			Map<String,Object> fieldsToValue = a.getPopulatedFieldsAsMap();
 
 			// make sure it handles nulls ok
-			Access.checkPermissions(AccessType.READABLE, new List<SObject> {a}, fieldsToValue.keySet());
+			Access.checkPermissions(Account.SObjectType, new List<SObject> {a}, AccessType.READABLE, fieldsToValue.keySet());
 
-			Access.checkPermissions(AccessType.CREATABLE, new List<SObject> {a}, fieldsToValue.keySet());
+			Access.checkPermissions(Account.SObjectType, new List<SObject> {a}, AccessType.CREATABLE, fieldsToValue.keySet());
 
-			Access.checkPermissions(AccessType.UPDATABLE, new List<Account> {a}, fieldsToValue.keySet());
+			Access.checkPermissions(Account.SObjectType, new List<Account> {a}, AccessType.UPDATABLE, fieldsToValue.keySet());
 
 		} catch (Exception e) {
 			Utils.logError(e);
@@ -119,14 +119,6 @@ private class AccessTest {
 			ass2.Status = 'Purchased';
 			ass2.DigitalAssetStatus = 'Off';
 
-			Lead l = new Lead();
-			l.FirstName = 'Boss';
-			l.LastName = 'Baby';
-			l.Company = 'Github';
-			l.Email = 'bb@github.com';
-			l.Phone = '303-867-5309';
-			l.Title = 'Boss Baby';
-
 			List<Schema.SObjectField> fieldsToCheck = new List<Schema.SObjectField> {
 				Asset.AccountId,
 				Asset.ExternalIdentifier,
@@ -134,18 +126,12 @@ private class AccessTest {
 				Asset.InstallDate,
 				Asset.Name,
 				Asset.Description,
-				Asset.Status,
-				Lead.FirstName,
-				Lead.LastName,
-				Lead.Company,
-				Lead.Email,
-				Lead.Phone,
-				Lead.Title
+				Asset.Status
 			};
 
 			Boolean hasError = false;
 			try { // Standard User profile of the user doesn't have read access for some Asset fields so should throw exception
-				Access.checkPermissions(AccessType.READABLE, new List<SObject> {ass1, ass2, l}, fieldsToCheck);
+				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.READABLE, fieldsToCheck);
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -153,7 +139,7 @@ private class AccessTest {
 			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have update access for some Asset fields so should throw exception
-				Access.checkPermissions(AccessType.UPDATABLE, new List<SObject> {ass1, ass2, l}, fieldsToCheck);
+				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPDATABLE, fieldsToCheck);
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -162,7 +148,16 @@ private class AccessTest {
 			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have upsert access for some Asset fields so should throw exception
-				Access.checkPermissions(AccessType.UPSERTABLE, new List<SObject> {ass1, ass2, l}, fieldsToCheck);
+				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
+			} catch (Exception e) {
+				hasError = true;
+			}
+
+			System.assert(hasError);
+			hasError = false; // reset for next test
+
+			try { // test validation that SObjectType does not match SObjectType of records passed in
+				Access.checkPermissions(Lead.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -197,22 +192,13 @@ private class AccessTest {
 			ass2.Status = 'Purchased';
 			ass2.DigitalAssetStatus = 'Off';
 
-			Lead l = new Lead();
-			l.FirstName = 'Boss';
-			l.LastName = 'Baby';
-			l.Company = 'Github';
-			l.Email = 'bb@github.com';
-			l.Phone = '303-867-5309';
-			l.Title = 'Boss Baby';
-
 			Set<String> fieldsToCheck = new Set<String>();
 			fieldsToCheck.addAll(ass1.getPopulatedFieldsAsMap().keySet());
 			fieldsToCheck.addAll(ass2.getPopulatedFieldsAsMap().keySet());
-			fieldsToCheck.addAll(l.getPopulatedFieldsAsMap().keySet());
 
 			Boolean hasError = false;
 			try { // Standard User profile of the user doesn't have read access for some Asset fields so should throw exception
-				Access.checkPermissions(AccessType.READABLE, new List<SObject> {ass1, ass2, l}, fieldsToCheck);
+				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.READABLE, fieldsToCheck);
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -220,7 +206,7 @@ private class AccessTest {
 			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have update access for some Asset fields so should throw exception
-				Access.checkPermissions(AccessType.UPDATABLE, new List<SObject> {ass1, ass2, l}, fieldsToCheck);
+				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPDATABLE, fieldsToCheck);
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -229,7 +215,16 @@ private class AccessTest {
 			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have upsert access for some Asset fields so should throw exception
-				Access.checkPermissions(AccessType.UPSERTABLE, new List<SObject> {ass1, ass2, l}, fieldsToCheck);
+				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
+			} catch (Exception e) {
+				hasError = true;
+			}
+
+			System.assert(hasError);
+			hasError = false; // reset for next test
+
+			try { // test validation that SObjectType does not match SObjectType of records passed in
+				Access.checkPermissions(Lead.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -246,27 +241,13 @@ private class AccessTest {
 			Log__c f = new Log__c();
 			f.Location__c = 'should fail';
 
-			Lead l = new Lead();
-			l.FirstName = 'Boss';
-			l.LastName = 'Baby';
-			l.Company = 'Github';
-			l.Email = 'bb@github.com';
-			l.Phone = '303-867-5309';
-			l.Title = 'Boss Baby';
-
 			List<Schema.SObjectField> fieldsToCheck = new List<Schema.SObjectField> {
-				Log__c.Location__c,
-				Lead.FirstName,
-				Lead.LastName,
-				Lead.Company,
-				Lead.Email,
-				Lead.Phone,
-				Lead.Title
+				Log__c.Location__c
 			};
 
 			Boolean hasError = false;
-			try { // Standard User profile of the user shouldn't have create access for our custom Log__c obj so should throw exception
-				Access.checkPermissions(AccessType.CREATABLE, new List<SObject> {f, l}, fieldsToCheck);
+			try {
+				Access.checkPermissions(Log__c.SObjectType, new List<SObject> {f}, AccessType.CREATABLE, fieldsToCheck);
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -274,8 +255,8 @@ private class AccessTest {
 
 			hasError = false; // reset for next test
 
-			try { // Standard User profile of the user doesn't have create access for the AccountBrand obj so should throw exception
-				Access.checkPermissions(AccessType.UPDATABLE, new List<SObject> {f, l}, fieldsToCheck);
+			try {
+				Access.checkPermissions(Log__c.SObjectType, new List<SObject> {f}, AccessType.UPDATABLE, f.getPopulatedFieldsAsMap().keySet());
 			} catch (Exception e) {
 				hasError = true;
 			}
@@ -289,9 +270,14 @@ private class AccessTest {
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
 			System.assertEquals(Account.SObjectType.getDescribe().isAccessible(), Access.isAccessible(Account.SObjectType));
 
-			// haven't found a object that's not accessible which i assume means queryable and/or retrieveable
 			try {
 				Access.checkIsAccessible(Account.SObjectType);
+			} catch (Exception e) {
+				System.assert(e.getMessage().startsWith('You do not have permission to Read'));
+			}
+
+			try { // shouldn't have access since this is a custom object and the permission set isn't assigned to this standard user
+				Access.checkIsAccessible(Log__c.SObjectType);
 			} catch (Exception e) {
 				System.assert(e.getMessage().startsWith('You do not have permission to Read'));
 			}

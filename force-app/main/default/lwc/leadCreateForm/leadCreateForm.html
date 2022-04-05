@@ -1,0 +1,30 @@
+<template>
+	<div class="slds-box" style="background-color:#fff;">
+		<div class="slds-text-heading_small" style="padding:6px;">Contact us for help or more information.</div>
+
+		<template if:true={formSubmitted}>
+			<div style="padding:6px;">
+				<strong>Thanks!</strong> We'll be in touch soon.<br/>
+				<br/><br/><br/><br/><br/><br/><br/><br/>
+			</div>
+		</template>
+	
+		<template if:false={formSubmitted}>
+			<div class="slds-form" style="padding:6px;" onkeypress={handleEnterKey}>
+				<lightning-input label="First Name" name="first" value={first} type="text" required onchange={handleOnChange} maxlength="40"></lightning-input>
+
+				<lightning-input label="Last Name" name="last" value={last} type="text" required onchange={handleOnChange} maxlength="80"></lightning-input>
+
+				<lightning-input label="Company" name="company" value={company} type="text" required onchange={handleOnChange} maxlength="40"></lightning-input>
+
+				<lightning-input label="Email" name="email" value={email} type="email" required onchange={handleOnChange} maxlength="40"></lightning-input>
+
+				<lightning-input label="Phone" name="phone" value={phone} type="tel" onchange={handleOnChange} maxlength="40"></lightning-input>
+
+				<lightning-input label="Country" name="country" value={country} type="text" onchange={handleOnChange} maxlength="40"></lightning-input>
+
+				<br/><lightning-button variant="brand" label="Submit" onclick={handleSubmit}></lightning-button>
+			</div>
+		</template>
+	</div>
+</template>

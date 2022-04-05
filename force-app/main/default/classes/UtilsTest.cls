@@ -29,6 +29,9 @@ private class UtilsTest {
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
 			Utils.log('val = '+ Utils.isSysAdmin());
 		}
+
+		String orgId = Constants.getOrgId();
+		System.assert(orgId != null);
 	}
 
 

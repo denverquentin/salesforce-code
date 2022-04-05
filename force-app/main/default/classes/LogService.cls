@@ -55,7 +55,7 @@ global with sharing class LogService {
 						Log__c.Location__c,
 						Log__c.Message__c
 					};
-					Access.checkPermissions(AccessType.CREATABLE, logs, fieldsToCheck);
+					Access.checkPermissions(Log__c.SObjectType, logs, AccessType.CREATABLE, fieldsToCheck);
 
 					insert logs;
 				}
@@ -66,32 +66,20 @@ global with sharing class LogService {
 	}
 
 
-		// deletes up to 10,000 Log__c records at a time - making global in case we need to do it in a customer's org
-		// not doing this as a Batch - shouldn't need to delete more than 10,000 on a daily basis
-		global static void deleteOldLogRecords(Integer daysToKeep) { // this supports 0 to delete all or any other number of days
-			Access.checkIsDeleteable(Log__c.SObjectType); // throws exception if user does not have delete permission on Log__c
-
-			if (daysToKeep == null) {
-				daysToKeep = 30;
-			}
-
-			// convert to a negative number if it's not already
-			if (daysToKeep >= 1) {
-				daysToKeep = daysToKeep * -1;
-			}
-			Utils.log('daysToKeep = ' + daysToKeep);
-
-			Datetime now = Datetime.now();
-			Utils.log('now = ' + now);
-			Datetime dateInPast = now.addDays(daysToKeep);
-			Utils.log('dateInPast = ' + dateInPast);
-
-			List<Log__c> logs = [select Id from Log__c where SystemModstamp < :dateInPast
-				with SECURITY_ENFORCED limit 10000];
-			Utils.log('logs.size() = ' + logs.size());
-
-			if (logs.size() > 0) {
-				delete logs;
-			}
+	// deletes up to 10,000 Log__c records at a time - making global in case we need to do it in a customer's org
+	// not doing this as a Batch - shouldn't need to delete more than 10,000 on a daily basis
+	global static void deleteOldLogRecords(Integer daysToKeep) {
+		Access.checkIsDeleteable(Log__c.SObjectType); // throws exception if user does not have delete permission on Log__c
+		if (daysToKeep == null) {
+			daysToKeep = 30;
 		}
+
+		Date d = System.today() - daysToKeep;
+		List<Log__c> logs = [select Id from Log__c where SystemModstamp < :d
+			with SECURITY_ENFORCED limit 10000];
+
+//		if (logs.size() > 0) {
+			delete logs;
+//		}
 	}
+}

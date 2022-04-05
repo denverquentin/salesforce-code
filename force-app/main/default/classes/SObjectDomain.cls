@@ -6,32 +6,13 @@
  * http://en.wikipedia.org/wiki/Domain_(software_engineering)
  *
  * Domain Model, "An object model of the domain that incorporates both behavior and data.",
- * "At its worst business logic can be very complex. Rules and logic describe many different "
- * "cases and slants of behavior, and it's this complexity that objects were designed to work with..."
+ * "At its worst business logic can be very complex. Rules and logic describe many different
+ * cases and slants of behavior, and it's this complexity that objects were designed to work with..."
  * Martin Fowler, EAA Patterns
  * http://martinfowler.com/eaaCatalog/domainModel.html
  *
  **/
 public virtual with sharing class SObjectDomain {
-	// Retains instances of domain classes implementing trigger stateful
-	private static Map<Type,List<SObjectDomain>> triggerStateByClass;
-
-	// Retains the trigger tracking configuration used for each domain
-	private static Map<Type,TriggerEvent> triggerEventByClass;
-
-	// Useful during unit testing to assert at a more granular and robust level for errors raised during the various trigger events
-	public static ErrorFactory errors {get; private set;}
-
-	// Useful during unit testing to access mock support for database inserts and udpates (testing without DML)
-	public static TestFactory test {get; private set;}
-
-	static {
-		errors = new ErrorFactory();
-		test = new TestFactory();
-		triggerStateByClass = new Map<Type,List<SObjectDomain>>();
-		triggerEventByClass = new Map<Type,TriggerEvent>();
-	}
-
 	// Provides access to the data represented by this domain class
 	public List<SObject> records { get; private set;}
 
@@ -40,6 +21,25 @@ public virtual with sharing class SObjectDomain {
 
 	// Exposes the configuration for this domain class instance
 	public Configuration configuration {get; private set;}
+
+	// Useful during unit testing to assert at a more granular and robust level for errors raised during the various trigger events
+	public static ErrorFactory errors {get; private set;}
+
+	// Useful during unit testing to access mock support for database inserts and udpates (testing without DML)
+	public static TestFactory test {get; private set;}
+
+	// Retains instances of domain classes implementing trigger stateful
+	private static Map<Type,List<SObjectDomain>> triggerStateByClass;
+
+	// Retains the trigger tracking configuration used for each domain
+	private static Map<Type,TriggerEvent> triggerEventByClass;
+
+	static {
+		errors = new ErrorFactory();
+		test = new TestFactory();
+		triggerStateByClass = new Map<Type,List<SObjectDomain>>();
+		triggerEventByClass = new Map<Type,TriggerEvent>();
+	}
 
 	/**
 	 * Constructs the domain class with the data on which to apply the behavior implemented within
@@ -591,12 +591,12 @@ public virtual with sharing class SObjectDomain {
 	public with sharing class TestSObjectDomain extends SObjectDomain {
 		private String someState;
 
-		public TestSObjectDomain(List<Opportunity> sObjectList) {
+		public TestSObjectDomain(List<Log__c> sObjectList) {
 			// Domain classes are initialized with lists to enforce bulkification throughout
 			super(sObjectList);
 		}
 
-		public TestSObjectDomain(List<Opportunity> sObjectList, SObjectType sObjectType) {
+		public TestSObjectDomain(List<Log__c> sObjectList, SObjectType sObjectType) {
 			// Domain classes are initialized with lists to enforce bulkification throughout
 			super(sObjectList, sObjectType);
 		}
@@ -606,8 +606,8 @@ public virtual with sharing class SObjectDomain {
 			super.onApplyDefaults();
 
 			// Apply defaults to TestSObjectDomain
-			for (Opportunity opp : (List<Opportunity>)records) {
-				opp.CloseDate = System.today().addDays(30);
+			for (Log__c l : (List<Log__c>)records) {
+				l.Location__c = 'Right Here';
 			}
 		}
 
@@ -616,9 +616,9 @@ public virtual with sharing class SObjectDomain {
 			super.onValidate();
 
 			// Validate TestSObjectDomain
-			for (Opportunity opp : (List<Opportunity>)records) {
-				if (opp.Type != null && opp.Type.startsWith('Existing') && opp.AccountId == null) {
-					opp.AccountId.addError( error('You must provide an Account for Opportunities for existing Customers.', opp, Opportunity.AccountId));
+			for (Log__c l : (List<Log__c>)records) {
+				if (l.Location__c != null && l.Information__c == null) {
+					l.Information__c.addError( error('You must provide Information.', l, Log__c.Information__c));
 				}
 			}
 		}
@@ -628,10 +628,10 @@ public virtual with sharing class SObjectDomain {
 			super.onValidate(existingRecords);
 
 			// Validate changes to TestSObjectDomain
-			for (Opportunity opp : (List<Opportunity>)records) {
-				Opportunity existingOpp = (Opportunity) existingRecords.get(opp.Id);
-				if (opp.Type != existingOpp.Type) {
-					opp.Type.addError( error('You cannot change the Opportunity type once it has been created.', opp, Opportunity.Type));
+			for (Log__c l : (List<Log__c>)records) {
+				Log__c existingLog = (Log__c) existingRecords.get(l.Id);
+				if (l.Location__c != existingLog.Location__c) {
+					l.Location__c.addError( error('You cannot change the Log Location once it has been created.', l, Log__c.Location__c));
 				}
 			}
 		}
@@ -641,8 +641,8 @@ public virtual with sharing class SObjectDomain {
 			super.onBeforeDelete();
 
 			// Validate changes to TestSObjectDomain
-			for (Opportunity opp : (List<Opportunity>) records) {
-				opp.addError(error('You cannot delete this Opportunity.', opp));
+			for (Log__c l : (List<Log__c>) records) {
+				l.addError(error('You cannot delete this Log.', l));
 			}
 		}
 
@@ -653,7 +653,7 @@ public virtual with sharing class SObjectDomain {
 
 		public override void onBeforeInsert() {
 			// Assert this variable is null in the after insert (since this domain class is stateless)
-			someState = 'This should not survice the trigger after phase';
+			someState = 'This should not service the trigger after phase';
 		}
 
 		public override void onAfterInsert() {
@@ -673,7 +673,7 @@ public virtual with sharing class SObjectDomain {
 	public with sharing class TestSObjectStatefulDomain extends SObjectDomain {
 		public String someState;
 
-		public TestSObjectStatefulDomain(List<Opportunity> sObjectList) {
+		public TestSObjectStatefulDomain(List<Log__c> sObjectList) {
 			super(sObjectList);
 			// Ensure this instance is re-used in the after trigger phase (subject to recursive scenarios)
 			configuration.enableTriggerState();
@@ -684,21 +684,21 @@ public virtual with sharing class SObjectDomain {
 			System.assertEquals(null, someState);
 
 			// Process records
-			List<Opportunity> newOpps = new List<Opportunity>();
-			for (Opportunity opp : (List<Opportunity>)records) {
+			List<Log__c> newLogs = new List<Log__c>();
+			for (Log__c l : (List<Log__c>)records) {
 				// Set some state sensitive to the incoming records
-				someState = 'Error on Record ' + opp.Name;
+				someState = 'Error on Record ' + l.Location__c;
 
-				// Create a new Opportunity record to trigger recursive code path?
-				if (opp.Name.equals('Test Recursive 1')) {
-					newOpps.add(new Opportunity(Name = 'Test Recursive 2', Type = 'Existing Account'));
+				// Create a new Log__c record to trigger recursive code path?
+				if (l.Location__c == 'Test Recursive 1') {
+					newLogs.add(new Log__c(Message__c = 'hi', Location__c = 'Test Recursive 2'));
 				}
 			}
 
 			// If testing recursiving emulate an insert
-			if (newOpps.size() > 0) {
+			if (newLogs.size() > 0) {
 				// This will force recursion and thus validate via the above assert results in a new domain instance
-				SObjectDomain.test.database.onInsert(newOpps);
+				SObjectDomain.test.database.onInsert(newLogs);
 				SObjectDomain.triggerHandler(SObjectDomain.TestSObjectStatefulDomainConstructor.class);
 			}
 		}
@@ -706,8 +706,8 @@ public virtual with sharing class SObjectDomain {
 		public override void onAfterInsert() {
 			// Use the state set in the before insert (since this is a stateful domain class)
 			if (someState != null) {
-				for (Opportunity opp : (List<Opportunity>)records) {
-					opp.addError(error(someState, opp));
+				for (Log__c l : (List<Log__c>)records) {
+					l.addError(error(someState, l));
 				}
 			}
 		}
@@ -722,11 +722,11 @@ public virtual with sharing class SObjectDomain {
 
 	// Test domain class (ideally this would be in the test class, however Type.newInstance does not see such classes)
 	public with sharing class TestSObjectOnValidateBehavior extends SObjectDomain {
-		public TestSObjectOnValidateBehavior(List<Opportunity> sObjectList) {
+		public TestSObjectOnValidateBehavior(List<Log__c> sObjectList) {
 			super(sObjectList);
 
 			// Enable old behavior based on the test Opportunity name passed in
-			if (sObjectList[0].Name == 'Test Enable Old Behavior') {
+			if (sObjectList[0].Location__c == 'Test Enable Old Behavior') {
 				configuration.enableOldOnUpdateValidateBehavior();
 			}
 		}

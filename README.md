@@ -118,13 +118,29 @@ sfdx force:source:retrieve -u dev -x manifest/package.xml
 ```
 
 
-#### Run All Tests
+### Run Tests and Check Development Standards
 Runs all unit tests in your dev org.
 ```
 sfdx force:apex:test:run -u dev --testlevel RunLocalTests --codecoverage --resultformat human
 ```
 
+Lint all LWC and Aura components in the repository.
+```
+npm run lint
+```
+
+Run the Apex static source scanner on code in the repository. Requires the sfdx scanner plugin.
+```
+sfdx scanner:run --target=force-app/main/default --engine pmd --pmdconfig "pmd/ruleset.xml"
+```
+
+
 #### Other
+Install the sfdx scanner plugin - https://forcedotcom.github.io/sfdx-scanner/en/getting-started/install/.
+```
+sfdx plugins:install @salesforce/sfdx-scanner
+```
+
 Display the API limits for the dev hub.
 ```
 sfdx force:limits:api:display -u devhub

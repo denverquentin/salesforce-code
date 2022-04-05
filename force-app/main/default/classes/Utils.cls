@@ -2,10 +2,7 @@ public inherited sharing class Utils {
 	// use this to determine if we're in a sandbox from a managed package - else use the code above
 	public static Boolean isSandbox() {
 		List<Organization> orgs = [select Id, IsSandbox from Organization with SECURITY_ENFORCED limit 1];
-		if (orgs.size() > 0 && orgs[0].IsSandbox) {
-			return true;
-		}
-		return false;
+		return (orgs.size() > 0 && orgs[0].IsSandbox) ? true : false;
 	}
 
 
@@ -16,21 +13,14 @@ public inherited sharing class Utils {
 
 
 	public static Boolean isMyDomainNameEnabled() {
-		if (Url.getOrgDomainUrl().toExternalForm().contains('.my.salesforce')) {
-			return true;
-		}
-		return false;
+		return Url.getOrgDomainUrl().toExternalForm().contains('.my.salesforce') ? true : false;
 	}
 
 
 	public static Boolean isSysAdmin() {
 		List<User> users = [SELECT Id, ProfileId, Profile.Name FROM User where Id = :UserInfo.getUserId()
 			AND Profile.Name = :Constants.PROFILE_NAME_SYSTEM_ADMINISTRATOR with SECURITY_ENFORCED];
-
-		if (users.size() == 1) { // means current user has Sys Admin profile
-			return true;
-		}
-		return false;
+		return (users.size() > 0) ? true : false;
 	}
 
 
@@ -85,7 +75,7 @@ public inherited sharing class Utils {
 			ContentVersion.FirstPublishLocationId
 		};
 		// security check - throws exception if no access to create object/fields
-		Access.checkPermissions(AccessType.CREATABLE, new List<SObject> {fileToUpload}, fieldsToCheck);
+		Access.checkPermissions(ContentVersion.SObjectType, new List<SObject> {fileToUpload}, AccessType.CREATABLE, fieldsToCheck);
 
 		// false positive - scanner isn't picking up security check above
 		insert fileToUpload;

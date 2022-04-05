@@ -7,6 +7,8 @@
         <members>Log</members>
         <members>LogService</members>
         <members>LogServiceTest</members>
+        <members>NavigationButtonController</members>
+        <members>NavigationButtonControllerTest</members>
         <members>SObjectDomain</members>
         <members>SObjectDomainTest</members>
         <members>TestData</members>
@@ -15,14 +17,24 @@
         <name>ApexClass</name>
     </types>
     <types>
+        <members>sfweb2lead</members>
+        <name>CspTrustedSite</name>
+    </types>
+    <types>
         <members>Log__c.Information__c</members>
         <members>Log__c.Location__c</members>
         <members>Log__c.Message__c</members>
+        <members>Variable__mdt.Org_Id__c</members>
         <name>CustomField</name>
-	    </types>
+    </types>
+    <types>
+        <members>Variable.MyOrg</members>
+        <name>CustomMetadata</name>
+    </types>
     <types>
         <members>Log__c</members>
-        <name>CustomObject</name>
+        <members>Variable__mdt </members>
+       <name>CustomObject</name>
     </types>
     <types>
         <members>Log__c</members>
@@ -30,7 +42,13 @@
     </types>
     <types>
         <members>Log__c-Log Layout</members>
+        <members>Variable__mdt-Variable Layout</members>
         <name>Layout</name>
+    </types>
+    <types>
+        <members>leadCreateForm</members>
+        <members>navigateTo</members>
+        <name>LightningComponentBundle</name>
     </types>
     <types>
         <members>Log__c.All</members>

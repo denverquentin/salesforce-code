@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Navigate To</masterLabel>
+    <description>Component to add a navigation Button or Link on a Lightning Home or Record Page. The button or Link can navigate to an object home, list view, absolute or relative url.</description>
+    <targets>
+        <target>lightning__HomePage</target>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__HomePage,lightning__RecordPage">
+            <property label="Label" name="label" type="String" default="Label" required="true" description="The button label or link text."/>
+            <property label="Button Style" name="buttonStyle" type="String" datasource="base,brand,destructive,inverse,neutral,outline-brand,success,text-destructive" default="brand" description="The style/class of the button. The base style is a plain text link."/>
+            <property label="Button Stretch" name="buttonStretch" type="String" datasource="Yes,No" default="No" description="Should the button stretch to fill the entire width available?"/>
+            <property label="Navigation Target" name="target" type="String" description="What's the navigation target? URL or Object List View or Object Home?" datasource="navigateToURL,navigateToListView,navigateToObjectHome" default="navigateToListView"/>
+            <property label="Object Name" name="objectApiName" type="String" description="What is the Object Api Name? Used when Navigation Target is navigateToObjectHome or navigateToListView."/>
+            <property label="List View API Name" name="listApiName" type="String" description="What is the ListView API Name? Used when Navigation Target is navigateToListView."/>
+            <property label="Url" name="url" type="String" description="What is the absolute or relative url? Used when Navigation Target is navigateToURL."/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
