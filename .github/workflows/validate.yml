@@ -1,0 +1,188 @@
+# GitHub Action to install SFDX and the SFDX Scanner so we can:
+# - analyze the Apex code for security and performance issues
+# - lint all javascript in all components
+# - build a scratch org and deploy all metadata to it
+# - run all unit tests
+# - delete the scratch org when done
+
+name: Validate Commit
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch and if something changes in our metadata directory
+  push:
+    branches: [ master, dev, feature/** ]
+    paths:
+#      - 'force-app/**'
+# commented out above until we get the cicd process finished - maybe leave this off forever
+  pull_request:
+    types: [opened, synchronized, reopened]
+    branches: [ master, dev, feature/** ]
+    paths:
+#      - 'force-app/**'
+# commented out above until we get the cicd process finished - maybe leave this off forever
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    # helpful docs: https://developer.salesforce.com/blogs/2020/01/using-salesforce-dx-with-github-actions
+    # https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm#sfdx_setup_install_cli_npm
+    steps:
+      # install sfdx & source scanner plugin
+      - name: Install SFDX (Salesforce CLI)
+        id: install-sfdx
+        run: |
+          node -v
+          npm -v
+          npm install --global sfdx-cli
+          sfdx plugins:install @salesforce/sfdx-scanner
+
+      - name: Output SFDX Version
+        id: output-sfdx
+        run: |
+          sfdx --version
+          sfdx force
+          sfdx plugins
+
+      # checkout the code in the pull request or commit
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      # lint javascript for lwc's
+      # TODO: this is deprecated - use the sfdx scanner:run intead - it has a lint feature
+      - name: Lint LWC
+        id: lint-lwc
+        run: |
+          npm ci
+          npm list --dev
+          npm run lint
+
+      # apex source scanner
+      # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
+      # rules are defined in the pmd/ruleset.xml
+      # all possible rules are documented here: https://pmd.github.io/latest/pmd_rules_apex.html
+      - name: Apex Source Scanner
+        id: analyze-apex
+        run: |
+          sfdx scanner:run --target=force-app/main/default --engine pmd --pmdconfig "pmd/ruleset.xml" --format=json --severity-threshold=2 --outfile=analyze-apex.json || true
+          if test -f analyze-apex.json; then
+            echo "ERROR: FIX THE PROBLEMS LISTED BELOW"
+            echo "analyze-apex.json = $(jq . analyze-apex.json)"
+            echo "::set-output name=error::Apex Source Scanner: Error = The source scanner found an Apex development standard violation. Please view the CI/CD log to see the issue(s)."
+            exit 1
+          fi
+
+      # TODO: IMPLEMENT SOME OF THE COOL NEW FEATURES DOCUMENTED HERE!!!
+      # https://developer.salesforce.com/blogs/2023/02/boost-code-performance-with-salesforce-code-analyzer
+
+      # authenticate to SF dev hub
+      # --username ${{ secrets.HUB_ORG_USER }}
+      - name: Authenticate to Salesforce Dev Hub
+        id: authenticate-devhub
+        run: |
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json || true
+          echo "auth.json = $(jq . auth.json)"
+          status=$(jq -r '.status' auth.json)
+          if [ $status -ne 0 ]; then
+            msg=$(jq -r '.message' auth.json)
+            echo "error = $msg"
+            echo "::set-output name=error::$msg"
+            exit 1
+          else
+            sfdx force:org:list
+          fi
+
+      # create a scratch org
+      - name: Create a Scratch Org
+        id: create-scratchorg
+        run: |
+          sfdx org create -f config/project-scratch-def.json --durationdays 1 --setalias validate --setdefaultusername --targetdevhubusername hub adminEmail=quentinf@gmail.com username="quentinf@github.com.$GITHUB_RUN_ID.$GITHUB_RUN_NUMBER" --wait 10 --json > scratch.json || true
+          echo "scratch.json = $(jq . scratch.json)"
+          status=$(jq -r '.status' scratch.json)
+          if [ $status -ne 0 ]; then
+            msg=$(jq -r '.message' scratch.json)
+            echo "::set-output name=error::${msg}"
+            echo "error = $msg"
+            echo "error = ${{ steps.create-scratchorg.outputs.error }}"
+            exit 1
+          else
+            sfdx force:user:password:generate -u validate
+            sfdx force:user:display -u validate --json > sfuser.json
+            echo "sfuser.json = $(jq . sfuser.json)"
+          fi
+
+      # deploy code to the scratch org
+      - name: Deploy Code
+        id: deploy-source
+        run: |
+          sfdx force:source:deploy -u validate -x manifest/package.xml --wait 10 --json > deploy.json || true
+          echo "deploy.json = $(jq . deploy.json)"
+          status=$(jq -r '.status' deploy.json)
+          if [ $status -ne 0 ]; then
+            msg=$(jq -r '.message' deploy.json)
+            echo "::set-output name=error::${msg}"
+            echo "error = $msg"
+            echo "error = ${{ steps.deploy-source.outputs.error }}"
+            exit 1
+          fi
+
+      # assign the permission set
+      - name: Assign Permission Set to Scratch Org User
+        id: assign-permission-set
+        run: sfdx force:user:permset:assign -n PermSet -u validate
+
+      # run all tests in the scratch org
+      - name: Run All Tests in Scratch Org
+        id: run-tests
+        run: |
+          sfdx force:apex:test:run -u validate --testlevel RunLocalTests --codecoverage --resultformat json > tests.json || true
+          echo "tests.json = $(jq . tests.json)"
+          status=$(jq -r '.status' tests.json)
+          if [ $status -ne 0 ]; then
+            result=$(cat tests.json | jq '.result')
+            msg=""
+            echo "error(s) below"
+            for row in $(echo "${result}" | jq -r '.tests[] | @base64'); do
+              _jq() {
+                echo ${row} | base64 --decode | jq -r ${1}
+              }
+              if [ "$(_jq '.Message')" != "null" ]; then
+                echo "error = $(_jq '.Message')"
+                echo "stack trace = $(_jq '.StackTrace')"
+                echo "-----------------------"
+                msg+="$(_jq '.Message')\ $(_jq '.StackTrace')\ "
+              fi
+            done
+            echo "::set-output name=error::Run All Tests: Errors = ${msg}"
+            exit 1
+          fi
+
+      # verify code coverage is good
+      - name: Verify Apex Class Code Coverage > 85%
+        id: verify-test-coverage
+        run: |
+          sfdx force:apex:execute -f scripts/check-test-coverage.apex -u validate --json > testcoverage.json
+          echo "testcoverage.json = $(jq . testcoverage.json)"
+
+      # https://github.com/marketplace/actions/execute-javascript-inline
+      # To use latest action, specify "release-master" instead of "v0.0.2"
+      - name: Determine Error
+        id: error
+        if: failure()
+        uses: satackey/action-js-inline@v0.0.2
+        with:
+          script: |
+            const core = require('@actions/core');
+            console.log(`error: ${{ steps.authenticate-devhub.outputs.error }}`);
+            core.setOutput('message', `${{ steps.authenticate-devhub.outputs.error }}`);
+
+      # delete the scratch org
+      - name: Delete the Scratch Org
+        run: sfdx org delete -u validate --noprompt

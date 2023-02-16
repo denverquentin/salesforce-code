@@ -7,6 +7,8 @@ global with sharing class Log {
 	global Exception excep {get;set;}
 	global String location {get;set;}
 	global String info {get;set;}
+	global Datetime startTime {get;set;}
+
 
 	global Log() {}
 
@@ -20,5 +22,10 @@ global with sharing class Log {
 		this.excep = excep;
 		this.location = location;
 		this.info = info;
+	}
+
+	public Log(Datetime startTime, String location) {
+		this.startTime = startTime;
+		this.location = location;
 	}
 }

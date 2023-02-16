@@ -14,7 +14,7 @@ private class LogServiceTest {
 
 			// should fail silently because of missing permission
 			List<Log__c> logs = [select Id, Message__c, Location__c, Information__c from Log__c];
-			System.assert(logs.size() == 0);
+			Assert.areEqual(logs.size(), 0);
 		}
 	}
 
@@ -34,10 +34,10 @@ private class LogServiceTest {
 			List<Log__c> logs = [select Id, Message__c, Location__c, Information__c from Log__c];
 			Utils.log('logs.size() = ' + logs.size());
 
-			System.assert(logs.size() == 1);
-			System.assert(String.isBlank(logs[0].Message__c));
-			System.assert(String.isBlank(logs[0].Location__c));
-			System.assert(String.isBlank(logs[0].Information__c)); // something is always written to this field
+			Assert.areEqual(logs.size(), 1);
+			Assert.isNull(logs[0].Message__c);
+			Assert.isNull(logs[0].Location__c);
+			Assert.isNull(logs[0].Information__c); // nothing written if not logging and exception and field is not set
 		}
 	}
 
@@ -51,10 +51,10 @@ private class LogServiceTest {
 			List<Log__c> logs = [select Id, Message__c, Location__c, Information__c from Log__c];
 			Utils.log('logs.size() = ' + logs.size());
 
-			System.assert(logs.size() == 1);
-			System.assertEquals('Class.Method_Location', logs[0].Location__c);
-			System.assertEquals('Oops I did it again', logs[0].Message__c);
-			System.assert(String.isNotBlank(logs[0].Information__c)); // something is always written to this field
+			Assert.areEqual(logs.size(), 1);
+			Assert.areEqual('Class.Method_Location', logs[0].Location__c);
+			Assert.areEqual('Oops I did it again', logs[0].Message__c);
+			Assert.isNotNull(logs[0].Information__c); // something is always written to this field
 
 			LogService.deleteOldLogRecords(null); // code coverage
 			// can't test that one was deleted since we can't have a negative integer
@@ -71,10 +71,10 @@ private class LogServiceTest {
 			List<Log__c> logs = [select Id, Message__c, Location__c, Information__c from Log__c];
 			Utils.log('logs.size() = ' + logs.size());
 
-			System.assert(logs.size() == 1);
-			System.assertEquals('Class.Method_Location', logs[0].Location__c);
-			System.assertEquals('Oops I did it again', logs[0].Message__c);
-			System.assert(String.isNotBlank(logs[0].Information__c)); // something is always written to this field
+			Assert.areEqual(logs.size(), 1);
+			Assert.areEqual('Class.Method_Location', logs[0].Location__c);
+			Assert.areEqual('Oops I did it again', logs[0].Message__c);
+			Assert.isNotNull(logs[0].Information__c); // something is always written to this field when logging an exception
 		}
 	}
 
@@ -100,10 +100,10 @@ private class LogServiceTest {
 			List<Log__c> logs = [select Id, Message__c, Location__c, Information__c from Log__c WHERE Message__c = 'Oops I did it again'];
 			Utils.log('logs.size() = ' + logs.size());
 
-			System.assert(logs.size() == 10);
-			System.assertEquals(logs[0].Message__c, 'Oops I did it again');
-			System.assertEquals(logs[0].Location__c, 'LogServiceTest.testLogService');
-			System.assert(String.isNotBlank(logs[0].Information__c));
+			Assert.areEqual(logs.size(), 10);
+			Assert.areEqual(logs[0].Message__c, 'Oops I did it again');
+			Assert.areEqual(logs[0].Location__c, 'LogServiceTest.testLogService');
+			Assert.isNotNull(logs[0].Information__c); // something is always written to this field when logging an exception
 		}
 	}
 }

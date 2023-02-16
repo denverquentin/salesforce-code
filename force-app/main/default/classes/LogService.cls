@@ -65,6 +65,33 @@ global with sharing class LogService {
 		}
 	}
 
+	// TODO: BUILD A START, SPLIT AND STOP TIMER THAT LOGS EXECUTION TIME AND CLASS.METHOD NAME
+	public static Log startTimer(String location) {
+		return new Log(Datetime.now(), location);
+	}
+
+	public static void stopTimer(Log lo) {
+		try {
+			if (lo != null && lo.startTime != null && String.isNotBlank(lo.location)) {
+				Log__c rec = new Log__c();
+				rec.Message__c = 'Executed in ' + (Datetime.now().getTime() - lo.startTime.getTime()) + ' milliseconds';
+				rec.Location__c = Utils.shortenString(lo.location, 255);// text 255 - shorten if too long
+
+				List<Schema.SObjectField> fieldsToCheck = new List<Schema.SObjectField> {
+					Log__c.Location__c,
+					Log__c.Message__c
+				};
+				Access.checkPermissions(Log__c.SObjectType, new List<Log__c> {rec}, AccessType.CREATABLE, fieldsToCheck);
+				insert rec;
+			}
+		} catch (Exception e) {// log to SF debug log and eat it
+			Utils.logError(e);
+		}
+	}
+
+	// IS IT ALSO POSSIBLE TO ADD A SPLIT METHOD? WOULD PROBABLY WORK BUT CLASSES WOULD HAVE TO PASS THE LOG OBJECT AROUND TO EACH
+
+
 
 	// deletes up to 10,000 Log__c records at a time - making global in case we need to do it in a customer's org
 	// not doing this as a Batch - shouldn't need to delete more than 10,000 on a daily basis

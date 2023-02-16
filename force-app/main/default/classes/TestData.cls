@@ -17,11 +17,13 @@ public with sharing class TestData {
 	// this doesn't work in test methods where you also need to create test records
 	// call it in the TestSetup method by itself
 	public static void createUserWithPermissionSet() {
+		String testEmail = 'a' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'b@hi' + String.valueOf(Math.random() * 10000000).subString(0, 5) + '.com';
+
 		User user = new User();
 		user.FirstName = 'Test';
 		user.LastName = 'User';
-		user.Email = 'test@github.com';
-		user.UserName = 'test@github.com';
+		user.Email = testEmail;
+		user.UserName = testEmail;
 		user.Alias = 'testuser';
 		user.IsActive = true;
 		user.EmailEncodingKey = 'UTF-8';
@@ -49,16 +51,28 @@ public with sharing class TestData {
 
 
 	public static User getUserWithPermissionSet() {
-		return [select Id from User where UserName = 'test@github.com' limit 1];
+		PermissionSet[] ps = [SELECT Id FROM PermissionSet WHERE Name = :Constants.PERM_SET_API_NAME];
+		if (ps.size() != 1) {
+			throw new Constants.UnexpectedException('Unable to find Permission Set: ' + Constants.PERM_SET_API_NAME);
+		} else {
+			PermissionSetAssignment[] psa = [SELECT AssigneeId FROM PermissionSetAssignment where PermissionSetId = :ps[0].Id];
+			if (psa.size() != 1) {
+				throw new Constants.UnexpectedException('Unable to find User assigned to Permission Set: ' + Constants.PERM_SET_API_NAME);
+			} else {
+				return [select Id from User where Id = :psa[0].AssigneeId];
+			}
+		}
 	}
 
 	// create a new User that can be used in Tests - not needed yet - would probably want to assign our perm set
 	public static User getActiveUserWithStandardProfile() {
+		String testEmail = 'y' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'z@bye' + String.valueOf(Math.random() * 10000000).subString(0, 5) + '.com';
+
 		User user = new User();
 		user.FirstName = 'Test';
 		user.LastName = 'User';
-		user.Email = 'test1@github.com';
-		user.UserName = 'test1@github.com';
+		user.Email = testEmail;
+		user.UserName = testEmail;
 		user.Alias = 'tuser1';
 		user.IsActive = true;
 		user.EmailEncodingKey = 'UTF-8';

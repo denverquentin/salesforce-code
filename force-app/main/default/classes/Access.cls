@@ -18,7 +18,7 @@ public inherited sharing class Access {
 								 AccessType.UPSERTABLE
 	 */
 	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, List<Schema.SObjectField> fieldsToCheck) {
-		//Datetime startTime = Datetime.now();
+		Log timer = LogService.startTimer('Access.checkPermissions - Schema.SObjectField');
 		Utils.log('checkPermissions.aType = ' + aType);
 
 		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
@@ -32,8 +32,7 @@ public inherited sharing class Access {
 		SObjectAccessDecision decision = Security.stripInaccessible(aType, records, enforceRootObjectCRUD);
 		//Utils.log('decision = ' + decision);
 
-		// line below can throw exception if the user doesn't have the permission on the object
-//		Map<String,Set<String>> res = decision.getRemovedFields();
+		// line below throws an exception if the user doesn't have the permission on the object! this lets us call 1 method instead of 2
 		Set<String> removedFields = decision.getRemovedFields().get(recType.getDescribe().getName());
 		//Utils.log('removedFields = ' + removedFields);
 
@@ -58,7 +57,7 @@ public inherited sharing class Access {
 				}
 			}
 		}
-		//Utils.log('Executed in ' + (Datetime.now().getTime() - startTime.getTime()) + ' milliseconds');
+		LogService.stopTimer(timer);
 	}
 
 
@@ -67,7 +66,7 @@ public inherited sharing class Access {
 	   Map<String,Object> fieldsToValue = rec.getPopulatedFieldsAsMap(); method that returns fields as a String
 	*/
 	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, Set<String> fieldsToCheck) {
-		//Datetime startTime = Datetime.now();
+		Log timer = LogService.startTimer('Access.checkPermissions - String');
 		Utils.log('checkPermissions.aType = ' + aType);
 
 		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
@@ -81,9 +80,7 @@ public inherited sharing class Access {
 		SObjectAccessDecision decision = Security.stripInaccessible(aType, records, enforceRootObjectCRUD);
 		//Utils.log('decision = ' + decision);
 
-		// line below can throw exception if the user doesn't have the permission on the object
-		//Map<String,Set<String>> res = decision.getRemovedFields();
-		//Utils.log('res = ' + res);
+		// line below throws an exception if the user doesn't have the permission on the object! this lets us call 1 method instead of 2
 		Set<String> removedFields = decision.getRemovedFields().get(recType.getDescribe().getName());
 		//Utils.log('removedFields = ' + removedFields);
 
@@ -102,7 +99,7 @@ public inherited sharing class Access {
 				}
 			}
 		}
-		//Utils.log('Executed in ' + (Datetime.now().getTime() - startTime.getTime()) + ' milliseconds');
+		LogService.stopTimer(timer);
 	}
 
 
