@@ -19,10 +19,9 @@ public inherited sharing class Access {
 	 */
 	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, List<Schema.SObjectField> fieldsToCheck) {
 		Log timer = LogService.startTimer('Access.checkPermissions - Schema.SObjectField');
-		Utils.log('checkPermissions.aType = ' + aType);
+		System.debug(LoggingLevel.INFO, 'checkPermissions.aType = ' + aType);
 
 		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
-			//Utils.log('rec = ' + rec);
 			if (rec.getSObjectType() != recType) {
 				throw new AccessException('recType ' + recType + ' does not match rec.SObjectType ' + rec.getSObjectType());
 			}
@@ -30,18 +29,15 @@ public inherited sharing class Access {
 
 		Boolean enforceRootObjectCRUD = true;
 		SObjectAccessDecision decision = Security.stripInaccessible(aType, records, enforceRootObjectCRUD);
-		//Utils.log('decision = ' + decision);
 
 		// line below throws an exception if the user doesn't have the permission on the object! this lets us call 1 method instead of 2
 		Set<String> removedFields = decision.getRemovedFields().get(recType.getDescribe().getName());
-		//Utils.log('removedFields = ' + removedFields);
 
 		// for AccessType.READABLE, we could return an error if there are ANY removed fields
 		// but it's not safe if we're checking any of the other AccessType's because a read-only field
 		// like a formula or auto-number Name could be removed if the field is queried but is not removed
 		// before calling this method. a SF DML call will ignore these read-only fields and not throw an exception
 
-//		Utils.log('fieldsToCheck = ' + fieldsToCheck);
 		// only need to continue if fieldsToCheck and removedFields have values
 		if (fieldsToCheck != null && fieldsToCheck.size() > 0 && removedFields != null && removedFields.size() > 0) {
 			Set<Schema.SObjectField> fieldsRemoved = new Set<Schema.SObjectField>();
@@ -51,7 +47,6 @@ public inherited sharing class Access {
 			}
 
 			for (Schema.SObjectField f : fieldsToCheck) {
-				//Utils.log('f = ' + f);
 				if (fieldsRemoved.contains(f)) {
 					throw new AccessException('You do not have permission to ' + getEnglishForAccessType(aType) + ' the ' + f + ' field.' + FIX_MSG);
 				}
@@ -67,10 +62,9 @@ public inherited sharing class Access {
 	*/
 	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, Set<String> fieldsToCheck) {
 		Log timer = LogService.startTimer('Access.checkPermissions - String');
-		Utils.log('checkPermissions.aType = ' + aType);
+		System.debug(LoggingLevel.INFO, 'checkPermissions.aType = ' + aType);
 
 		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
-			//Utils.log('rec = ' + rec);
 			if (rec.getSObjectType() != recType) {
 				throw new AccessException('recType ' + recType + ' does not match rec.SObjectType ' + rec.getSObjectType());
 			}
@@ -78,18 +72,16 @@ public inherited sharing class Access {
 
 		Boolean enforceRootObjectCRUD = true;
 		SObjectAccessDecision decision = Security.stripInaccessible(aType, records, enforceRootObjectCRUD);
-		//Utils.log('decision = ' + decision);
 
 		// line below throws an exception if the user doesn't have the permission on the object! this lets us call 1 method instead of 2
 		Set<String> removedFields = decision.getRemovedFields().get(recType.getDescribe().getName());
-		//Utils.log('removedFields = ' + removedFields);
 
 		// for AccessType.READABLE, we could return an error if there are ANY removed fields
 		// but it's not safe if we're checking any of the other AccessType's because a read-only field
 		// like a formula or auto-number Name could be removed if the field is queried but is not removed
 		// before calling this method. a SF DML call will ignore these read-only fields and not throw an exception
 
-		Utils.log('fieldsToCheck = ' + fieldsToCheck);
+		System.debug(LoggingLevel.INFO, 'fieldsToCheck = ' + fieldsToCheck);
 		// only need to continue if fieldsToCheck and removedFields have values
 		if (fieldsToCheck != null && fieldsToCheck.size() > 0 && removedFields != null && removedFields.size() > 0) {
 			for (String f : fieldsToCheck) {

@@ -3,20 +3,20 @@ private class AccessTest {
 
 	@IsTest
 	static void testFieldPermissionsHappy() {
-		Utils.log('Access.isAccessible(Account.SObjectType) = ' + Access.isAccessible(Account.SObjectType));
-		Utils.log('Access.isCreateable(Account.SObjectType) = ' + Access.isCreateable(Account.SObjectType));
-		Utils.log('Access.isUpdateable(Account.SObjectType) = ' + Access.isUpdateable(Account.SObjectType));
-		Utils.log('Access.isDeleteable(Account.SObjectType) = ' + Access.isDeleteable(Account.SObjectType));
+		System.debug(LoggingLevel.INFO, 'Access.isAccessible(Account.SObjectType) = ' + Access.isAccessible(Account.SObjectType));
+		System.debug(LoggingLevel.INFO, 'Access.isCreateable(Account.SObjectType) = ' + Access.isCreateable(Account.SObjectType));
+		System.debug(LoggingLevel.INFO, 'Access.isUpdateable(Account.SObjectType) = ' + Access.isUpdateable(Account.SObjectType));
+		System.debug(LoggingLevel.INFO, 'Access.isDeleteable(Account.SObjectType) = ' + Access.isDeleteable(Account.SObjectType));
 
 		Access.isFieldAccessible(Account.Name);
 		Access.isFieldCreateable(Account.Name);
 		Access.isFieldUpdateable(Account.Name);
 
-		System.assertEquals('', Access.getEnglishForAccessType(null));
-		System.assertEquals('Read', Access.getEnglishForAccessType(AccessType.READABLE));
-		System.assertEquals('Create', Access.getEnglishForAccessType(AccessType.CREATABLE));
-		System.assertEquals('Update', Access.getEnglishForAccessType(AccessType.UPDATABLE));
-		System.assertEquals('Upsert', Access.getEnglishForAccessType(AccessType.UPSERTABLE));
+		Assert.areEqual('', Access.getEnglishForAccessType(null));
+		Assert.areEqual('Read', Access.getEnglishForAccessType(AccessType.READABLE));
+		Assert.areEqual('Create', Access.getEnglishForAccessType(AccessType.CREATABLE));
+		Assert.areEqual('Update', Access.getEnglishForAccessType(AccessType.UPDATABLE));
+		Assert.areEqual('Upsert', Access.getEnglishForAccessType(AccessType.UPSERTABLE));
 
 		try { // wrapping in try catch just in case there's something funky in the customer's org
 			Account a = new Account(Name='Test Security');
@@ -31,7 +31,7 @@ private class AccessTest {
 			a.BillingCountry = 'USA';
 
 			insert a;
-			System.assert(a.Id != null);
+			Assert.isNotNull(a.Id);
 
 			List<Schema.SObjectField> fieldsToCheck = new List<Schema.SObjectField> {
 				Account.Name,
@@ -57,7 +57,7 @@ private class AccessTest {
 			Access.checkPermissions(Account.SObjectType, new List<Account> {a}, AccessType.UPDATABLE, fieldsToCheck);
 
 		} catch (Exception e) {
-			Utils.logError(e);
+			System.debug(LoggingLevel.ERROR, e.getMessage());
 		}
 	}
 
@@ -77,7 +77,7 @@ private class AccessTest {
 			a.BillingCountry = 'USA';
 
 			insert a;
-			System.assert(a.Id != null);
+			Assert.isNotNull(a.Id);
 
 			Map<String,Object> fieldsToValue = a.getPopulatedFieldsAsMap();
 
@@ -89,7 +89,7 @@ private class AccessTest {
 			Access.checkPermissions(Account.SObjectType, new List<Account> {a}, AccessType.UPDATABLE, fieldsToValue.keySet());
 
 		} catch (Exception e) {
-			Utils.logError(e);
+			System.debug(LoggingLevel.ERROR, e.getMessage());
 		}
 	}
 
@@ -129,40 +129,29 @@ private class AccessTest {
 				Asset.Status
 			};
 
-			Boolean hasError = false;
 			try { // Standard User profile of the user doesn't have read access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.READABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-			System.assert(hasError);
-			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have update access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPDATABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-
-			System.assert(hasError);
-			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have upsert access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-
-			System.assert(hasError);
-			hasError = false; // reset for next test
 
 			try { // test validation that SObjectType does not match SObjectType of records passed in
 				Access.checkPermissions(Lead.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-
-			System.assert(hasError);
 		}
 	}
 
@@ -196,40 +185,29 @@ private class AccessTest {
 			fieldsToCheck.addAll(ass1.getPopulatedFieldsAsMap().keySet());
 			fieldsToCheck.addAll(ass2.getPopulatedFieldsAsMap().keySet());
 
-			Boolean hasError = false;
 			try { // Standard User profile of the user doesn't have read access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.READABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-			System.assert(hasError);
-			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have update access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPDATABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-
-			System.assert(hasError);
-			hasError = false; // reset for next test
 
 			try { // Standard User profile of the user doesn't have upsert access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-
-			System.assert(hasError);
-			hasError = false; // reset for next test
 
 			try { // test validation that SObjectType does not match SObjectType of records passed in
 				Access.checkPermissions(Lead.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-
-			System.assert(hasError);
 		}
 	}
 
@@ -238,29 +216,24 @@ private class AccessTest {
 	static void testFieldPermissionsWithBadObjectAccess() {
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
 
-			Log__c f = new Log__c();
-			f.Location__c = 'should fail';
+			ApexClass ac = new ApexClass();
+			ac.Body = 'public class Failing {}';
 
 			List<Schema.SObjectField> fieldsToCheck = new List<Schema.SObjectField> {
-				Log__c.Location__c
+				ApexClass.Body
 			};
 
-			Boolean hasError = false;
 			try {
-				Access.checkPermissions(Log__c.SObjectType, new List<SObject> {f}, AccessType.CREATABLE, fieldsToCheck);
+				Access.checkPermissions(ApexClass.SObjectType, new List<SObject> {ac}, AccessType.CREATABLE, fieldsToCheck);
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-			System.assert(hasError);
-
-			hasError = false; // reset for next test
 
 			try {
-				Access.checkPermissions(Log__c.SObjectType, new List<SObject> {f}, AccessType.UPDATABLE, f.getPopulatedFieldsAsMap().keySet());
+				Access.checkPermissions(ApexClass.SObjectType, new List<SObject> {ac}, AccessType.UPDATABLE, ac.getPopulatedFieldsAsMap().keySet());
+				Assert.fail('Exception Expected');
 			} catch (Exception e) {
-				hasError = true;
 			}
-			System.assert(hasError);
 		}
 	}
 
@@ -276,14 +249,23 @@ private class AccessTest {
 				System.assert(e.getMessage().startsWith('You do not have permission to Read'));
 			}
 
-			try { // shouldn't have access since this is a custom object and the permission set isn't assigned to this standard user
-				Access.checkIsAccessible(Log__c.SObjectType);
+			Schema.SObjectType inaccessibleSO;
+			for (Schema.SObjectType so : Schema.getGlobalDescribe().values()) {
+				if (!so.getDescribe().isAccessible()) {
+					inaccessibleSO = so;
+					break;
+				}
+			}
+
+			try {
+				Access.checkIsAccessible(inaccessibleSO);
 			} catch (Exception e) {
 				System.assert(e.getMessage().startsWith('You do not have permission to Read'));
 			}
 
+
 			try {
-				Access.checkIsAccessible(new List<Schema.SObjectType> {Account.SObjectType, Lead.SObjectType, Case.SObjectType});
+				Access.checkIsAccessible(new List<Schema.SObjectType> {Account.SObjectType, Lead.SObjectType, Case.SObjectType, ApexClass.SObjectType});
 			} catch (Exception e) {
 				System.assert(e.getMessage().startsWith('You do not have permission to Read'));
 			}

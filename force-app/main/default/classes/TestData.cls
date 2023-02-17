@@ -52,11 +52,11 @@ public with sharing class TestData {
 
 	public static User getUserWithPermissionSet() {
 		PermissionSet[] ps = [SELECT Id FROM PermissionSet WHERE Name = :Constants.PERM_SET_API_NAME];
-		if (ps.size() != 1) {
+		if (ps.size() == 0) {
 			throw new Constants.UnexpectedException('Unable to find Permission Set: ' + Constants.PERM_SET_API_NAME);
 		} else {
 			PermissionSetAssignment[] psa = [SELECT AssigneeId FROM PermissionSetAssignment where PermissionSetId = :ps[0].Id];
-			if (psa.size() != 1) {
+			if (psa.size() == 0) {
 				throw new Constants.UnexpectedException('Unable to find User assigned to Permission Set: ' + Constants.PERM_SET_API_NAME);
 			} else {
 				return [select Id from User where Id = :psa[0].AssigneeId];
@@ -64,7 +64,7 @@ public with sharing class TestData {
 		}
 	}
 
-	// create a new User that can be used in Tests - not needed yet - would probably want to assign our perm set
+	// create a new User that can be used in Tests
 	public static User getActiveUserWithStandardProfile() {
 		String testEmail = 'y' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'z@bye' + String.valueOf(Math.random() * 10000000).subString(0, 5) + '.com';
 
