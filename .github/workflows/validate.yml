@@ -60,9 +60,10 @@ jobs:
       - name: Lint LWC
         id: lint-lwc
         run: |
-          npm ci
-          npm list --dev
           npm run lint
+
+#npm ci
+#npm list --dev
 
       # apex source scanner
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
