@@ -5,15 +5,15 @@ This DevOps process works good for large teams with a mix of developer levels an
 
 The developer wiki contains important information about:
 
-[Our Git Branch Model & Flow](Salesforce-Git-Branching-Model)
+[Git Branch Model & Flow](Salesforce-Git-Branching-Model.md)
 
-[Setup Steps for Salesforce Development](Salesforce-Development-Setup)
+[Setup Steps for Salesforce Development](Salesforce-Development-Setup.md)
 
-[Salesforce Development Flow](Salesforce-Development-Flow)
+[Salesforce Development Flow](Salesforce-Development-Flow.md)
 
-[Continuous Integration / Continuous Delivery](Salesforce-CICD-Process)
+[Continuous Integration / Continuous Delivery](Salesforce-CICD-Process.md)
 
-[Salesforce Development Standards](Salesforce-Development-Standards)
+[Salesforce Development Standards](Salesforce-Development-Standards.md)
 
 
 ## Contribute
