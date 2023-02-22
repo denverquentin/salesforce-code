@@ -1,5 +1,5 @@
 # Git Branching Model
-This document describes the recommended Git flow we'll use while developing application features in Salesforce. Our process closely follows this [classic Git branching model](https://nvie.com/posts/a-successful-git-branching-model/#the-main-branches) and includes an automated [Continuous Integration and Continuous Delivery](Salesforce-CICD-Process).
+This document describes the recommended Git flow we'll use while developing application features in Salesforce. Our process closely follows this [classic Git branching model](https://nvie.com/posts/a-successful-git-branching-model/#the-main-branches) and includes an automated [Continuous Integration and Continuous Delivery](Salesforce-CICD-Process.md).
 
 This model supports:
 - multiple developers working on different features at a time in their own scratch org which is a best practice
@@ -33,7 +33,7 @@ Our model will contain most of the branches in the article referenced above exce
 3. Developers will create a new branch from the `dev` branch and name it `feature/my_name/issue-123` so we can easily identify what kind of branch it is, who is working on it and it's corresponding story or bug name.
 4. Developers will make their changes for the story and commit all code changes to their `feature` branch along with a commit comment. Our CI/CD process runs a validation on each `feature` branch commit to lint and analyze code for security issues, make sure the metadata deploys, that all unit tests pass and that code coverage is sufficient. This validation builds a scratch org that is deleted once the validation is complete.
 5. Once the developer has tested their feature and provided instructions on how to test in the story, they should create a Pull Request to merge their `feature` branch into the `dev` branch and request a review.
-6. A senior developer will be responsible for reviewing Pull Requests. Things to review include everything documented in our [Development Standards](Salesforce-Development-Standards) such as:
+6. A senior developer will be responsible for reviewing Pull Requests. Things to review include everything documented in our [Salesforce Development Standards](Salesforce-Development-Standards.md) such as:
     - Naming Conventions
     - Proper language and correct spelling of object and field names and descriptions along with any other text visible to users
     - Good code that's easy to understand and/or is well commented
@@ -52,6 +52,6 @@ In the example below, the create a branch step is a `feature` branch and the mer
 ## Git Package Build Flow
 1. At the end of the sprint, we'll check that all features that were merged into the `dev` branch have passed QA testing. Any feature that failed testing can be removed, commented out or fixed depending on the urgency of the feature and when the release needs to go live in production.
 2. Once the test team signs off on features in the `dev` branch, it will be merged into the `main` branch.
-3. SFDX scripts will be used to build a new "released" application or package version from the `main` branch. We will create a Release record in GitHub based on tags and document links to completed stories and bug fixes.
+3. SFDX scripts will be used to build a new "released" application or package version from the `main` branch. We will create a Release record in GitHub by tagging the released `main` branch so we can document links to completed stories and bug fixes.
 4. The test team will verify that the new package installs correctly for new installs and for upgrades (if building a managed package). This step can be automated with SFDX scripts.
 5. The `main` branch will be merged into the `dev` branch so it has the latest and greatest for the new sprint.

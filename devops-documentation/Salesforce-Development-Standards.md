@@ -97,7 +97,7 @@ Here are some great Secure App Trailheads all developers should take:
 
 All trigger logic for an object will use the
 [Domain Layer - Apex Enterprise Patterns](https://github.com/apex-enterprise-patterns/fflib-apex-common#this-library)
-which groups all trigger handling into 1 class per object. Our trigger handlers should all extend the [SObjectDomain.cls](https://github.com/UST-Accounts/COMP-PRAS-DP-00-ust-secure-app/blob/dev/force-app/main/default/classes/SObjectDomain.cls) class in the repository.
+which groups all trigger handling into 1 class per object. You can download and implement the [trigger handler along with a working example from the UST Solution Hub](https://solutionhub.ustpace.com/#/assets/465/version/475).
 
 Here are Trailheads that discuss the `Domain`, `Selector` and `Service` Apex Enterprise Patterns that have become standards for managed package development:
 
@@ -117,7 +117,7 @@ These patterns help us achieve these trigger dev standards:
 
 - Updates to the current record in context should be done before insert/update context to avoid extra DML.
 
-- Triggers are re-invoked on record update or record insert actions from flows, workflows and process builders. For this reason we should not have both triggers and flows defined for an object. Pick one [(preferably triggers)](Development-Standards#flows-and-workflows) to keep things fast.
+- Triggers are re-invoked on record update or record insert actions from flows, workflows and process builders. For this reason we should not have both triggers and flows defined for an object. Pick one [(preferably triggers)](Salesforce-Development-Standards#flows-and-workflows.md) to keep things fast.
 
 ### Database Queries and DML in Apex
 
@@ -133,7 +133,7 @@ These patterns help us achieve these trigger dev standards:
 
 - Limit the number of SOQL statements by using relationships to query related objects/data.
 
-- You can use [Access.cls](https://github.com/UST-Accounts/COMP-PRAS-DP-00-ust-secure-app/blob/dev/force-app/main/default/classes/Access.cls) to check CRUD permissions on objects and fields before making database calls. These access checks are required to pass the security review.
+- You can use [Access.cls](https://solutionhub.ustpace.com/#/assets/455/version/465) to check CRUD permissions on objects and fields before making database calls. These access checks are required to pass the security review.
 
 ### Managed Package Apex Coding Guidelines
 
@@ -145,7 +145,7 @@ These patterns help us achieve these trigger dev standards:
 
 - Utilize Maps instead of nested for loops. Nested for loops are very slow.
 
-- Use `try - catch` blocks to trap exceptions throughout the application. Exceptions should be displayed to end users if possible or else logged to records so they can be reviewed and fixed. We have a [Logging Service](https://github.com/UST-Accounts/COMP-PRAS-DP-00-ust-secure-app/blob/dev/force-app/main/default/classes/LogService.cls) built into the application that should be used when logging exceptions.
+- Use `try - catch` blocks to trap exceptions throughout the application. Exceptions should be displayed to end users if possible or else logged to records so they can be reviewed and fixed. We have a [Logging Service](https://solutionhub.ustpace.com/#/assets/446/version/456) built into the application that should be used when logging exceptions.
 
 - Methods that only need to be called within one class should be marked as private. This makes refactoring easier since a developer can easily determine that a private method is not referenced outside the class.
 
