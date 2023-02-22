@@ -106,4 +106,24 @@ private class LogServiceTest {
 			Assert.isNotNull(logs[0].Information__c); // something is always written to this field when logging an exception
 		}
 	}
+
+
+	@IsTest
+	static void testLogTimer() {
+		System.runAs(TestData.getUserWithPermissionSet()) {
+			Log logTimer = LogService.startTimer('TestClassName.testMethodName');
+			Assert.areEqual(logTimer.location, 'TestClassName.testMethodName');
+			Assert.isNotNull(logTimer.startTime);
+
+			LogService.stopTimer(logTimer);
+
+			List<Log__c> logs = [select Id, Message__c, Location__c from Log__c WHERE Location__c = 'TestClassName.testMethodName'];
+			System.debug(LoggingLevel.INFO, 'logs.size() = ' + logs.size());
+
+			Assert.areEqual(logs.size(), 1);
+			Assert.isTrue(logs[0].Message__c.startsWith('Executed in'));
+		}
+		// test error handling
+		LogService.stopTimer(null);
+	}
 }

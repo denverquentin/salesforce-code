@@ -41,7 +41,7 @@ public with sharing class TestData {
 
 		PermissionSet[] ps = [SELECT Id FROM PermissionSet WHERE Name = :Constants.PERM_SET_API_NAME];
 
-		if (ps.size() != 1) {
+		if (ps.size() == 0) {
 			throw new Constants.UnexpectedException('Unable to find Permission Set: ' + Constants.PERM_SET_API_NAME);
 		} else {
 			PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = ps[0].Id, AssigneeId = user.Id);
