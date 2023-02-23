@@ -2,7 +2,7 @@
 
 `Continuous integration` is a software development practice where members of a team use a version control system and frequently integrate their work to the same location, such as a main branch. Each change is built and verified to detect integration errors as quickly as possible. Continuous integration is focused on automatically building and testing code, as compared to continuous delivery, which automates the entire software release process up to production.
 
-`Continuous delivery` is a software development methodology where the release process is automated. Every software change is automatically built, tested, and packaged. Before the final push to package, the team decides when the final push should occur. Although every successful software change can be immediately released to production with continuous delivery, not all changes need to be released right away.
+`Continuous delivery` is a software development methodology where the release process is automated. Every software change is automatically built, tested, and packaged or deployed. Before the final push to package or deploy, the team decides when the final push should occur. Although every successful software change can be immediately released to production with continuous delivery, not all changes need to be released right away.
 
 These article details some great benefits from using CI/CD.
 
@@ -17,39 +17,39 @@ We'll fire our CI/CD processes based on Git commits to specific branches and the
 
 ### Commit to feature branch
 
-We will have a CI process to build a namespaced scratch org with a duration of 1 day upon every commit to a `feature` branch. This verifies:
+We will have a CI process to build a scratch org with a duration of 1 day upon every commit to a `feature` branch. This CI process will:
 
-- that the metadata deploys correctly
+- run a lint utility on LWC and Aura Javascript
 
-- runs a lint utility on LWC and Aura Javascript
+- run the [Salesforce Code Analyzer](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run/) on the codebase
 
-- all unit tests pass
+- deploy metadata to the scratch org to verify it deploys correctly
 
-- that each apex class and trigger has > 80% coverage
+- run unit tests to check that they pass
+
+- check that each apex class and trigger has > 85% coverage
 
 This is a great check for developers that everything is ready for a Pull Request. It also lets the Pull Request approver know that the feature changes is ready for review.
 
 ### Merge feature branch to dev branch (Pull Request approved)
 
-We will have a CI process to build a namespaced scratch org with a duration of 10 days upon every commit to the `dev` branch. This build validates the same things the the feature branch build does but also:
+We will have a CI process to build a scratch org with a duration of 10 days upon every commit to the `dev` branch. This build validates the same things the the feature branch build does but also:
 
 - creates a username and password we can use to login to this org to test the new feature
 
 - assign our permission set to the scratch org user
 
-- create a community and deploy our “shell” community pages
-
 - run any other Apex scripts necessary to get the org ready for UAT
 
-- maybe also build a beta package that should pick up any errors based on metadata or code changes (global to non-global, deleted metadata, etc)
+- load any test data needed for UAT
 
 ### Merge dev branch or hotfix branch to main branch
 
-We will have a CI process to build a released package based on the main branch. This process may also:
+The CI process should build a package OR deploy code to the production Salesforce from the main branch. If building a package, this process may include:
 
-- build a non-namespaced scratch org and install the UST Secure managed package to test that a new install is successful.
+- build a scratch org and install the package to test that a new install is successful.
 
-- upgrade the UST Secure package in a permanent org to make sure it is successful. this get's complicated because we have to setup JWT authentication for the permanent org.
+- upgrade the package in a permanent org to make sure it is successful.
 
 ## Setup JWT Bearer Flow Authorization for Salesforce CI-CD
 

@@ -117,7 +117,7 @@ These patterns help us achieve these trigger dev standards:
 
 - Updates to the current record in context should be done before insert/update context to avoid extra DML.
 
-- Triggers are re-invoked on record update or record insert actions from flows, workflows and process builders. For this reason we should not have both triggers and flows defined for an object. Pick one [(preferably triggers)](Salesforce-Development-Standards#flows-and-workflows.md) to keep things fast.
+- Triggers are re-invoked on record update or record insert actions from flows, workflows and process builders. For this reason we should not have both triggers and flows defined for an object. Pick one [(preferably triggers)](Salesforce-Development-Standards.md#flows-and-workflows) to keep things fast.
 
 ### Database Queries and DML in Apex
 
