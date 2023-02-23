@@ -10,19 +10,21 @@ Before you can begin coding or customizing Salesforce, you must have a login to 
 ### Software Prerequisite
 These software tools need to be installed on your computer.
 1. [Salesforce CLI (sfdx) tool](https://developer.salesforce.com/tools/sfdxcli)
-2. A Git repository
-3. [Visual Studio Code + all the Salesforce extensions installed](https://developer.salesforce.com/tools/vscode/)
+2. [Visual Studio Code + all the Salesforce extensions installed](https://developer.salesforce.com/tools/vscode/)
+3. Access to a Git repository
+4. Access to a Salesforce Dev Hub to build Scratch orgs or access to a Developer org.
 
 If you are new to any of these tools, you should complete the [Set Up Your Workspace and Install Developer Tools](https://trailhead.salesforce.com/en/content/learn/trails/set-up-your-workspace-and-install-developer-tools) trail on Salesforce Trailhead.
 
 
 ### Add Repository to VSC
-A lot of this process is documented in the [Salesforce VSC documentation](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models/). Below is a summary of the required steps.
+A lot of this process is documented in the [Salesforce VSC documentation](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models/). Below is a summary of the required steps. It assumes you already have a Git repository with the [Salesforce project directory](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_create_new.htm) structure.
 
-1. Clone this repository to your local computer and open the directory in VSC.
-2. In VSC open the command palette (ctrl + shift + p), start typing *Run SFDX: Authorize an Org* and select it. Select the right SF domain to login to (developer orgs are login.salesforce.com and sandboxes and scratch orgs are test.salesforce.com). On the next step, give the org an alias and then a browser window will open for you to login to Salesforce. Once you login, your VSC project will be connected to the Salesforce org.\
+1. Clone the Salesforce project Git repository to your local computer and open the directory in VSC. VSC also has a `Git Add Remote` command that lets you clone the repository in VSC - you just need the repository url.
+2. The current branch you're working on is shown on the VSC status bar on the bottom left. Click on the branch name to change it or to create a new feature branch. Change the Git branch to dev if it's not already set.
+3. In VSC open the command palette (ctrl + shift + p), start typing *Run SFDX: Authorize an Org* and select it. Select the right SF domain to login to (developer orgs are login.salesforce.com and sandboxes and scratch orgs are test.salesforce.com). On the next step, give the org an alias and then a browser window will open for you to login to Salesforce. Once you login, your VSC project will be connected to the Salesforce org.\
 *Important Note:* If you have already authorized an org on your computer using sfdx, there is a place on the VSC status bar (at bottom) where you can select an org that's already been authenticated. You can select this for the project instead of authorizing again.
-3. Once you've authorized an Org, right click on the manifest/package.xml file and select *SFDX: Deploy Source in Manifest to Org*. This will push all the metadata and code from the repository into your SF Org.
+4. Once you've authorized an Org, right click on the manifest/package.xml file and select *SFDX: Deploy Source in Manifest to Org*. This will push all the metadata and code from the repository into your SF Org. You can also use the SFDX [Deploy Metadata to Org](Salesforce-Development-Setup.md#Deploy-Metadata-to-Org) command if you prefer using a CLI.
 
 
 ### SFDX Commands
@@ -78,7 +80,7 @@ sfdx force:org:create -f config/project-scratch-def.json --durationdays 30 --set
 
 Deploy all metadata defined in the manifest/package.xml to your Salesforce scratch org.
 ```
-sfdx force:source:deploy -u scratch -x manifest/package.xml
+sfdx force:source:deploy -x manifest/package.xml -u scratch
 ```
 
 Assign the a permission set named "PermSet" to your scratch org user.
@@ -112,21 +114,21 @@ sfdx force:org:delete -u scratch
 #### Deploy Metadata to Org
 Deploy (push) all metadata and code from the Git branch on your local computer to your SF dev org. Only metadata defined in manifest/package.xml is deployed.
 ```
-sfdx force:source:deploy -u dev -x manifest/package.xml
+sfdx force:source:deploy -x manifest/package.xml -u scratch
 ```
 
 
 #### Retrieve Metadata from Org
 Retrieve (pull) all metadata and code defined in the manifest/package.xml from your SF dev org to your computer.
 ```
-sfdx force:source:retrieve -u dev -x manifest/package.xml
+sfdx force:source:retrieve -x manifest/package.xml -u scratch
 ```
 
 
 ### Run Tests and Check Development Standards
 Runs all unit tests in your dev org.
 ```
-sfdx force:apex:test:run -u dev --testlevel RunLocalTests --codecoverage --resultformat human
+sfdx force:apex:test:run --testlevel RunLocalTests --codecoverage --resultformat human -u scratch
 ```
 
 Lint all LWC and Aura components in the repository.
@@ -134,7 +136,7 @@ Lint all LWC and Aura components in the repository.
 npm run lint
 ```
 
-Run the Apex static source scanner on code in the repository. Requires the sfdx scanner plugin.
+Run the Apex static source scanner on code in the repository. Requires the sfdx scanner plugin. You should create a [custom Apex PMD ruleset](https://github.com/pmd/pmd/blob/master/pmd-apex/src/main/resources/rulesets/apex/quickstart.xml) and store it in pmd/ruleset.xml to only run rules important to the project.
 ```
 sfdx scanner:run --target=force-app/main/default --engine pmd --pmdconfig "pmd/ruleset.xml"
 ```

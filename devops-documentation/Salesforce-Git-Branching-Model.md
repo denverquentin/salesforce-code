@@ -37,7 +37,7 @@ Our model will contain most of the branches in the article referenced above exce
     - Naming Conventions
     - Proper language and correct spelling of object and field names and descriptions along with any other text visible to users
     - Good code that's easy to understand and/or is well commented
-    - Unit test exists for new code and that has > 80% coverage
+    - Unit test exists for new code and that has > 85% coverage
     - The package.xml was updated with added metadata
     - Nothing that has already been packaged was deleted (if building a managed package)
     - Code will pass an internal or Salesforce Security Review
@@ -48,10 +48,3 @@ Our model will contain most of the branches in the article referenced above exce
 In the example below, the create a branch step is a `feature` branch and the merge and deploy goes into our `dev` branch.
 ![pull-request.PNG](images/pull-request.PNG)
 
-
-## Git Package Build Flow
-1. At the end of the sprint, we'll check that all features that were merged into the `dev` branch have passed QA testing. Any feature that failed testing can be removed, commented out or fixed depending on the urgency of the feature and when the release needs to go live in production.
-2. Once the test team signs off on features in the `dev` branch, it will be merged into the `main` branch.
-3. SFDX scripts will be used to build a new "released" application or package version from the `main` branch. We will create a Release record in GitHub by tagging the released `main` branch so we can document links to completed stories and bug fixes.
-4. The test team will verify that the new package installs correctly for new installs and for upgrades (if building a managed package). This step can be automated with SFDX scripts.
-5. The `main` branch will be merged into the `dev` branch so it has the latest and greatest for the new sprint.
