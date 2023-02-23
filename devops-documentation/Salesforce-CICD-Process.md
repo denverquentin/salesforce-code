@@ -31,7 +31,7 @@ We will have a CI process to build a scratch org with a duration of 1 day upon e
 
 This is a great check for developers that everything is ready for a Pull Request. It also lets the Pull Request approver know that the feature changes is ready for review.
 
-### Merge feature branch to dev branch (Pull Request approved)
+### Merge feature branch to dev branch
 
 We will have a CI process to build a scratch org with a duration of 10 days upon every commit to the `dev` branch. This build validates the same things the the feature branch build does but also:
 
