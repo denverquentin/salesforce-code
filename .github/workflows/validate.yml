@@ -63,7 +63,7 @@ jobs:
           npm ci
           npm list --dev
           sfdx scanner:run --target=**/*.js --engine eslint-lwc --eslintconfig=force-app/main/default/lwc/.eslintrc.json
-          sfdx scanner:run --target**/*.js --engine "retire-js"
+          sfdx scanner:run --target=**/*.js --engine "retire-js"
 
 #          npm run lint
 #sfdx scanner:run --target=force-app/main/default --engine eslint-lwc --eslintconfig=.eslintrc.json
