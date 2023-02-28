@@ -96,7 +96,7 @@ jobs:
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile ${{ secrets.HUB_ORG_PRIVATE_KEY }} --setalias hub --setdefaultdevhubusername --json > auth.json || true
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile="${{ secrets.HUB_ORG_PRIVATE_KEY }}" --setalias hub --setdefaultdevhubusername --json > auth.json || true
           echo "auth.json = $(jq . auth.json)"
           status=$(jq -r '.status' auth.json)
           if [ $status -ne 0 ]; then
