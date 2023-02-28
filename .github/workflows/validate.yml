@@ -76,7 +76,6 @@ jobs:
           if test -f analyze-static.json; then
             echo "ERROR: FIX THE PROBLEMS LISTED BELOW"
             echo "analyze-static.json = $(jq . analyze-static.json)"
-            echo "::set-output name=error::Apex Source Scanner: Error = The source scanner found an Apex development standard violation. Please view the CI/CD log to see the issue(s)."
             exit 1
           fi
 
@@ -89,7 +88,6 @@ jobs:
           if test -f analyze-graph.json; then
             echo "ERROR: FIX THE PROBLEMS LISTED BELOW"
             echo "analyze-graph.json = $(jq . analyze-graph.json)"
-            echo "::set-output name=error::Apex Graph Engine: Error = The graph engine found an Apex development standard violation. Please view the CI/CD log to see the issue(s)."
             exit 1
           fi
 
@@ -104,7 +102,6 @@ jobs:
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' auth.json)
             echo "error = $msg"
-            echo "::set-output name=error::$msg"
             exit 1
           else
             sfdx force:org:list
@@ -119,7 +116,6 @@ jobs:
           status=$(jq -r '.status' scratch.json)
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' scratch.json)
-            echo "::set-output name=error::${msg}"
             echo "error = $msg"
             echo "error = ${{ steps.create-scratchorg.outputs.error }}"
             exit 1
@@ -138,7 +134,6 @@ jobs:
           status=$(jq -r '.status' deploy.json)
           if [ $status -ne 0 ]; then
             msg=$(jq -r '.message' deploy.json)
-            echo "::set-output name=error::${msg}"
             echo "error = $msg"
             echo "error = ${{ steps.deploy-source.outputs.error }}"
             exit 1
@@ -171,7 +166,6 @@ jobs:
                 msg+="$(_jq '.Message')\ $(_jq '.StackTrace')\ "
               fi
             done
-            echo "::set-output name=error::Run All Tests: Errors = ${msg}"
             exit 1
           fi
 
@@ -181,18 +175,6 @@ jobs:
         run: |
           sfdx force:apex:execute -f scripts/check-test-coverage.apex -u validate --json > testcoverage.json
           echo "testcoverage.json = $(jq . testcoverage.json)"
-
-      # https://github.com/marketplace/actions/execute-javascript-inline
-      # To use latest action, specify "release-master" instead of "v0.0.2"
-#      - name: Determine Error
-#        id: error
-#        if: failure()
-#        uses: satackey/action-js-inline@v0.0.2
-#        with:
-#          script: |
-#            const core = require('@actions/core');
-#            console.log(`error: ${{ steps.authenticate-devhub.outputs.error }}`);
-#            core.setOutput('message', `${{ steps.authenticate-devhub.outputs.error }}`);
 
       # delete the scratch org
       - name: Delete the Scratch Org

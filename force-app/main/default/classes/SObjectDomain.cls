@@ -213,6 +213,7 @@ public virtual with sharing class SObjectDomain {
 	public static void triggerHandler(Type domainClass) {
 		// Process the trigger context
 		if (System.Test.isRunningTest() & test.database.hasRecords()) {
+			Utils.log('test.database.hasRecords() =' + test.database.hasRecords());
 			// If in test context and records in the mock database delegate initially to the mock database trigger handler
 			//test.database.testTriggerHandler(domainClass);
 		} else {
