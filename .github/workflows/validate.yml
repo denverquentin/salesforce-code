@@ -63,7 +63,7 @@ jobs:
           npm ci
           npm list --dev
           sfdx scanner:run --target='**/lwc/**/*.js,**/aura/**/*.js' --engine retire-js
-          sfdx scanner:run --target='**/lwc/**/*.js,**/aura/**/*.js' --engine eslint-lwc --eslintconfig=force-app/main/default/lwc/.eslintrc.json
+          sfdx scanner:run --target='**/lwc/**/*.js,**/aura/**/*.js' --engine eslint --eslintconfig=force-app/main/default/lwc/.eslintrc.json
 
       # apex source scanner
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/

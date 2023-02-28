@@ -214,7 +214,7 @@ public virtual with sharing class SObjectDomain {
 		// Process the trigger context
 		if (System.Test.isRunningTest() & test.database.hasRecords()) {
 			// If in test context and records in the mock database delegate initially to the mock database trigger handler
-			test.database.testTriggerHandler(domainClass);
+			//test.database.testTriggerHandler(domainClass);
 		} else {
 			// Process the runtime Apex Trigger context
 			triggerHandler(domainClass,
@@ -536,13 +536,11 @@ public virtual with sharing class SObjectDomain {
 
 		private MockDatabase() { }
 
+		/* graph engine said this isn't being called so commenting it out
 		private void testTriggerHandler(Type domainClass) {
-			// Mock Before
-			triggerHandler(domainClass, true, false, isInsert, isUpdate, isDelete, isUndelete, records, oldRecords);
-
-			// Mock After
-			triggerHandler(domainClass, false, true, isInsert, isUpdate, isDelete, isUndelete, records, oldRecords);
-		}
+			triggerHandler(domainClass, true, false, isInsert, isUpdate, isDelete, isUndelete, records, oldRecords); // Mock Before
+			triggerHandler(domainClass, false, true, isInsert, isUpdate, isDelete, isUndelete, records, oldRecords); // Mock After
+		}*/
 
 		public void onInsert(List<SObject> records) {
 			this.isInsert = true;
