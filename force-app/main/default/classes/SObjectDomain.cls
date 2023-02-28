@@ -191,11 +191,6 @@ public virtual with sharing class SObjectDomain {
 		SObjectDomain construct(List<SObject> sObjectList);
 	}
 
-	// Interface used to aid the triggerHandler in constructing instances of Domain classes
-	public interface IConstructable2 extends IConstructable {
-		SObjectDomain construct(List<SObject> sObjectList, SObjectType sObjectType);
-	}
-
 	/**
 	 * For Domain classes implementing the ITriggerStateful interface returns the instance
 	 *   of the domain class being shared between trigger invocations, returns null if

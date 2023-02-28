@@ -62,30 +62,36 @@ jobs:
         run: |
           npm ci
           npm list --dev
-          sfdx scanner:run --target=**/*.js --engine eslint-lwc --eslintconfig=force-app/main/default/lwc/.eslintrc.json
-          sfdx scanner:run --target=**/*.js --engine "retire-js"
-
-#          npm run lint
-#sfdx scanner:run --target=force-app/main/default --engine eslint-lwc --eslintconfig=.eslintrc.json
-#sfdx scanner:run --target "somedirectory" --engine "eslint,retire-js"
+          sfdx scanner:run --target='force-app/main/default/lwc/**/*.js,force-app/main/default/aura/**/*.js' --engine eslint-lwc --eslintconfig=force-app/main/default/lwc/.eslintrc.json
+          sfdx scanner:run --target='force-app/main/default/lwc/**/*.js,force-app/main/default/aura/**/*.js' --engine retire-js
 
       # apex source scanner
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
       # rules are defined in the pmd/ruleset.xml
       # all possible rules are documented here: https://pmd.github.io/latest/pmd_rules_apex.html
       - name: Apex Source Scanner
-        id: analyze-apex
+        id: analyze-static
         run: |
-          sfdx scanner:run --target=force-app/main/default --engine pmd --pmdconfig "pmd/ruleset.xml" --format=json --severity-threshold=2 --outfile=analyze-apex.json || true
-          if test -f analyze-apex.json; then
+          sfdx scanner:run --target=force-app/main/default --engine pmd --pmdconfig "pmd/ruleset.xml" --format=json --severity-threshold=2 --outfile=analyze-static.json || true
+          if test -f analyze-static.json; then
             echo "ERROR: FIX THE PROBLEMS LISTED BELOW"
-            echo "analyze-apex.json = $(jq . analyze-apex.json)"
+            echo "analyze-static.json = $(jq . analyze-static.json)"
             echo "::set-output name=error::Apex Source Scanner: Error = The source scanner found an Apex development standard violation. Please view the CI/CD log to see the issue(s)."
             exit 1
           fi
 
-      # TODO: IMPLEMENT SOME OF THE COOL NEW FEATURES DOCUMENTED HERE!!!
+      # use the source scanner to look for unused classes and methods
       # https://developer.salesforce.com/blogs/2023/02/boost-code-performance-with-salesforce-code-analyzer
+      - name: Apex Graph Engine
+        id: analyze-graph
+        run: |
+          sfdx scanner:run --target=force-app/main/default --projectdir ./ --engine sfge --format=json --outfile=analyze-graph.json || true
+          if test -f analyze-graph.json; then
+            echo "ERROR: FIX THE PROBLEMS LISTED BELOW"
+            echo "analyze-graph.json = $(jq . analyze-graph.json)"
+            echo "::set-output name=error::Apex Graph Engine: Error = The graph engine found an Apex development standard violation. Please view the CI/CD log to see the issue(s)."
+            exit 1
+          fi
 
       # authenticate to SF dev hub
       # --username ${{ secrets.HUB_ORG_USER }}
