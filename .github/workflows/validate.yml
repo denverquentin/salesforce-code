@@ -35,6 +35,10 @@ jobs:
     # helpful docs: https://developer.salesforce.com/blogs/2020/01/using-salesforce-dx-with-github-actions
     # https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm#sfdx_setup_install_cli_npm
     steps:
+      # checkout the code in the pull request or commit
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       # install sfdx & source scanner plugin
       - name: Install SFDX (Salesforce CLI)
         id: install-sfdx
@@ -51,18 +55,19 @@ jobs:
           sfdx force
           sfdx plugins
 
-      # checkout the code in the pull request or commit
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      # lint javascript for lwc's
-      # TODO: this is deprecated - use the sfdx scanner:run intead - it has a lint feature
+      # lint javascript for lwc's - need the first 2 npm commands to get
+      # the correct devDependencies from the package.json installed
       - name: Lint LWC
         id: lint-lwc
         run: |
           npm ci
           npm list --dev
-          npm run lint
+          sfdx scanner:run --target=**/*.js --engine eslint-lwc --eslintconfig=force-app/main/default/lwc/.eslintrc.json
+          sfdx scanner:run --target**/*.js --engine "retire-js"
+
+#          npm run lint
+#sfdx scanner:run --target=force-app/main/default --engine eslint-lwc --eslintconfig=.eslintrc.json
+#sfdx scanner:run --target "somedirectory" --engine "eslint,retire-js"
 
       # apex source scanner
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
@@ -87,7 +92,7 @@ jobs:
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile sf.key --setalias hub --setdefaultdevhubusername --json > auth.json || true
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.HUB_ORG_CLIENTID }} --username ${{ secrets.HUB_ORG_USER }} --jwtkeyfile ${{ secrets.HUB_ORG_PRIVATE_KEY }} --setalias hub --setdefaultdevhubusername --json > auth.json || true
           echo "auth.json = $(jq . auth.json)"
           status=$(jq -r '.status' auth.json)
           if [ $status -ne 0 ]; then
