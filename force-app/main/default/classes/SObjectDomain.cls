@@ -63,7 +63,7 @@ public virtual with sharing class SObjectDomain {
 		// Ensure the domain class has its own copy of the data
 		records = sObjectList.clone();
 		// Capture SObjectType describe for this domain class
-		sObjectDescribe = sObjectType.getDescribe();
+		sObjectDescribe = sObjectType.getDescribe(SObjectDescribeOptions.DEFAULT);
 		// Configure the Domain object instance
 		configuration = new Configuration();
 	}

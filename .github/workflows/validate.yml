@@ -62,8 +62,8 @@ jobs:
         run: |
           npm ci
           npm list --dev
-          sfdx scanner:run --target='force-app/main/default/lwc/**/*.js,force-app/main/default/aura/**/*.js' --engine eslint-lwc --eslintconfig=force-app/main/default/lwc/.eslintrc.json
-          sfdx scanner:run --target='force-app/main/default/lwc/**/*.js,force-app/main/default/aura/**/*.js' --engine retire-js
+          sfdx scanner:run --target='**/lwc/**/*.js,**/aura/**/*.js' --engine retire-js
+          sfdx scanner:run --target='**/lwc/**/*.js,**/aura/**/*.js' --engine eslint-lwc --eslintconfig=force-app/main/default/lwc/.eslintrc.json
 
       # apex source scanner
       # https://forcedotcom.github.io/sfdx-scanner/en/scanner-commands/run/
@@ -72,7 +72,7 @@ jobs:
       - name: Apex Source Scanner
         id: analyze-static
         run: |
-          sfdx scanner:run --target=force-app/main/default --engine pmd --pmdconfig "pmd/ruleset.xml" --format=json --severity-threshold=2 --outfile=analyze-static.json || true
+          sfdx scanner:run --target=force-app/main/default --engine pmd --pmdconfig='pmd/ruleset.xml' --format=json --severity-threshold=2 --outfile=analyze-static.json || true
           if test -f analyze-static.json; then
             echo "ERROR: FIX THE PROBLEMS LISTED BELOW"
             echo "analyze-static.json = $(jq . analyze-static.json)"

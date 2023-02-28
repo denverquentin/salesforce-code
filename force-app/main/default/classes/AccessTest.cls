@@ -133,24 +133,28 @@ private class AccessTest {
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.READABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 
 			try { // Standard User profile of the user doesn't have update access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPDATABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 
 			try { // Standard User profile of the user doesn't have upsert access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 
 			try { // test validation that SObjectType does not match SObjectType of records passed in
 				Access.checkPermissions(Lead.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 		}
 	}
@@ -189,24 +193,28 @@ private class AccessTest {
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.READABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 
 			try { // Standard User profile of the user doesn't have update access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPDATABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 
 			try { // Standard User profile of the user doesn't have upsert access for some Asset fields so should throw exception
 				Access.checkPermissions(Asset.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 
 			try { // test validation that SObjectType does not match SObjectType of records passed in
 				Access.checkPermissions(Lead.SObjectType, new List<SObject> {ass1, ass2}, AccessType.UPSERTABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 		}
 	}
@@ -227,12 +235,14 @@ private class AccessTest {
 				Access.checkPermissions(ApexClass.SObjectType, new List<SObject> {ac}, AccessType.CREATABLE, fieldsToCheck);
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 
 			try {
 				Access.checkPermissions(ApexClass.SObjectType, new List<SObject> {ac}, AccessType.UPDATABLE, ac.getPopulatedFieldsAsMap().keySet());
 				Assert.fail('Exception Expected');
 			} catch (Exception e) {
+				System.debug(LoggingLevel.ERROR, e.getMessage());
 			}
 		}
 	}
@@ -241,7 +251,7 @@ private class AccessTest {
 	@IsTest
 	static void testSObjectAccessible() {
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
-			System.assertEquals(Account.SObjectType.getDescribe().isAccessible(), Access.isAccessible(Account.SObjectType));
+			System.assertEquals(Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFAULT).isAccessible(), Access.isAccessible(Account.SObjectType));
 
 			try {
 				Access.checkIsAccessible(Account.SObjectType);
@@ -276,7 +286,7 @@ private class AccessTest {
 	@IsTest
 	static void testSObjectCreateable() {
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
-			System.assertEquals(Account.SObjectType.getDescribe().isCreateable(), Access.isCreateable(Account.SObjectType));
+			System.assertEquals(Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFAULT).isCreateable(), Access.isCreateable(Account.SObjectType));
 
 			try {
 				Access.checkIsCreateable(Account.SObjectType);
@@ -296,7 +306,7 @@ private class AccessTest {
 	@IsTest
 	static void testSObjectUpdateable() {
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
-			System.assertEquals(Account.SObjectType.getDescribe().isUpdateable(), Access.isUpdateable(Account.SObjectType));
+			System.assertEquals(Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFAULT).isUpdateable(), Access.isUpdateable(Account.SObjectType));
 
 			try {
 				Access.checkIsUpdateable(Account.SObjectType);
@@ -316,7 +326,7 @@ private class AccessTest {
 	@IsTest
 	static void testSObjectDeleteable() {
 		System.runAs(TestData.getActiveUserWithStandardProfile()) {
-			System.assertEquals(Account.SObjectType.getDescribe().isDeletable(), Access.isDeleteable(Account.SObjectType));
+			System.assertEquals(Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFAULT).isDeletable(), Access.isDeleteable(Account.SObjectType));
 
 			try {
 				Access.checkIsDeleteable(Account.SObjectType);

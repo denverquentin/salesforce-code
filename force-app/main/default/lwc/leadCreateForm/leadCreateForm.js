@@ -46,7 +46,7 @@ export default class LeadCreateForm extends LightningElement {
 					//'debugEmail': 'quentinf@gmail.com',
 					'country': this.country
 				})
-			}).then(response => {
+			}).then(() => {
 				this.formSubmitted = true; // hides the form and shows a "we'll be in touch" message
 				this.dispatchEvent(new ShowToastEvent({
 					title: 'Thanks!',
