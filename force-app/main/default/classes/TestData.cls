@@ -6,7 +6,7 @@ public with sharing class TestData {
 		c.AccountId = accountId;
 		c.FirstName = 'First' + String.valueOf(Math.random() * 10000000).subString(0, 7);
 		c.LastName = 'Last' + String.valueOf(Math.random() * 10000000).subString(0, 7);
-		c.Email =  'a' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'b@hi' + String.valueOf(Math.random() * 10000000).subString(0, 5) + '.com';
+		c.Email =  'a' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'b@hi' + String.valueOf(Math.random() * 10000000).subString(0, 5).replaceAll('.', '0') + '.com';
 		c.Phone = String.valueOf(Math.random() * 10000000).subString(0, 10).remove('-');
 
 		// logging because getting dupes on this
@@ -17,7 +17,7 @@ public with sharing class TestData {
 	// this doesn't work in test methods where you also need to create test records
 	// call it in the TestSetup method by itself
 	public static void createUserWithPermissionSet() {
-		String testEmail = 'a' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'b@hi' + String.valueOf(Math.random() * 10000000).subString(0, 5) + '.com';
+		String testEmail = 'a' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'b@hi' + String.valueOf(Math.random() * 10000000).subString(0, 5).replaceAll('.', '0') + '.com';
 
 		User user = new User();
 		user.FirstName = 'Test';
@@ -66,7 +66,7 @@ public with sharing class TestData {
 
 	// create a new User that can be used in Tests
 	public static User getActiveUserWithStandardProfile() {
-		String testEmail = 'y' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'z@bye' + String.valueOf(Math.random() * 10000000).subString(0, 5) + '.com';
+		String testEmail = 'y' + String.valueOf(Math.random() * 10000000).subString(0, 7) + 'z@bye' + String.valueOf(Math.random() * 10000000).subString(0, 5).replaceAll('.', '0') + '.com';
 
 		User user = new User();
 		user.FirstName = 'Test';

@@ -18,7 +18,6 @@ public inherited sharing class Access {
 								 AccessType.UPSERTABLE
 	 */
 	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, List<Schema.SObjectField> fieldsToCheck) {
-		Log timer = LogService.startTimer('Access.checkPermissions - Schema.SObjectField');
 		System.debug(LoggingLevel.INFO, 'checkPermissions.aType = ' + aType);
 
 		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
@@ -52,7 +51,6 @@ public inherited sharing class Access {
 				}
 			}
 		}
-		LogService.stopTimer(timer);
 	}
 
 
@@ -61,7 +59,6 @@ public inherited sharing class Access {
 	   Map<String,Object> fieldsToValue = rec.getPopulatedFieldsAsMap(); method that returns fields as a String
 	*/
 	public static void checkPermissions(SObjectType recType, List<SObject> records, AccessType aType, Set<String> fieldsToCheck) {
-		Log timer = LogService.startTimer('Access.checkPermissions - String');
 		System.debug(LoggingLevel.INFO, 'checkPermissions.aType = ' + aType);
 
 		for (SObject rec : records) { // check that the recType matches the SObjectType of each record passed in
@@ -91,7 +88,6 @@ public inherited sharing class Access {
 				}
 			}
 		}
-		LogService.stopTimer(timer);
 	}
 
 
