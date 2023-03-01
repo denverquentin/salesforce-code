@@ -92,7 +92,6 @@ jobs:
           fi
 
       # authenticate to SF dev hub
-      # --username ${{ secrets.HUB_ORG_USER }}
       - name: Authenticate to Salesforce Dev Hub
         id: authenticate-devhub
         run: |
@@ -107,11 +106,6 @@ jobs:
           else
             sfdx force:org:list
           fi
-
-#          echo "$env:HUB_ORG_PRIVATE_KEY" > server.key
-#          echo "key = server.key"
-#        env:
-#          HUB_ORG_PRIVATE_KEY: ${{ secrets.HUB_ORG_PRIVATE_KEY }}
 
       # create a scratch org
       - name: Create a Scratch Org
